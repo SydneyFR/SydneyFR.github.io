@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Groundhog Day Predictor Search</title>
+<meta name="description" content="Search Groundhog Day prognosticators by name, state or province, and type of creature, and see each one's prediction track record.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #3a2a2e;
+    --muted: #6f5d61;
+    --accent: #e8344f;
+    --accent-soft: #ffe3e8;
+    --card: #ffffff;
+    --line: #ffd9df;
+    --shadow: 0 8px 22px rgba(232, 52, 79, .10);
+    --winter: #3b5bdb;   /* saw shadow: six more weeks of winter */
+    --spring: #f59f00;   /* no shadow: early spring */
+    --font: "Nunito", "Segoe UI Rounded", "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: transparent; color: var(--ink); font: 16px/1.5 var(--font); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 16px; }
+
+  h1 { font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 800; margin: 0 0 4px; }
+  .intro { color: var(--muted); margin: 0 0 16px; }
+
+  .controls { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; background: var(--card); padding: 16px; border-radius: 24px; box-shadow: var(--shadow); }
+  .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  label { font-size: .8rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
+  input, select { font: inherit; color: var(--ink); width: 100%; padding: 10px 14px; border: 2px solid var(--line); border-radius: 999px; background: #fff; }
+  input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 14px 4px; }
+  .count { font-weight: 700; }
+  .bar-right { display: flex; align-items: center; gap: 10px; }
+  .bar select { width: auto; padding: 6px 12px; }
+  .reset { font: inherit; font-weight: 800; color: var(--accent); background: var(--accent-soft); border: 0; border-radius: 999px; padding: 7px 16px; cursor: pointer; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .85rem; color: var(--muted); margin: 0 4px 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+  .results { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .card { background: var(--card); border-radius: 24px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .card h2 { font-size: 1.25rem; font-weight: 800; margin: 0; }
+  .where { color: var(--muted); margin: 0 0 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .pill { background: var(--accent-soft); color: #b3203a; font-size: .8rem; font-weight: 700; padding: 3px 12px; border-radius: 999px; }
+  .pill.off { background: #eee; color: #555; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 0 0 14px; }
+  .stat { background: #fff7f5; border-radius: 16px; padding: 8px 12px; }
+  .stat dt { font-size: .75rem; font-weight: 700; color: var(--muted); }
+  .stat dd { margin: 0; font-size: 1.3rem; font-weight: 800; }
+  .stat small { font-size: .75rem; font-weight: 600; color: var(--muted); }
+
+  .strip { display: flex; flex-wrap: wrap; gap: 3px; margin: 0; padding: 0; list-style: none; }
+  .strip li { width: 16px; height: 16px; border-radius: 4px; border: 2px solid transparent; }
+  .y-shadow { background: var(--winter); }
+  .y-noshadow { background: var(--spring); }
+  .y-na { background: repeating-linear-gradient(45deg, #ccc 0 3px, #eee 3px 6px); }
+  .y-none { border-color: #e6dcde !important; background: transparent; }
+  .strip-label { display: flex; justify-content: space-between; font-size: .75rem; color: var(--muted); margin-top: 4px; }
+
+  details { margin-top: 12px; }
+  summary { cursor: pointer; font-weight: 800; color: var(--accent); }
+  details p { margin: 8px 0 0; color: var(--muted); font-size: .95rem; }
+  details a { color: var(--accent); font-weight: 700; }
+  .empty, .error { background: var(--card); border-radius: 24px; padding: 28px; text-align: center; box-shadow: var(--shadow); }
+  .foot { color: var(--muted); font-size: .8rem; margin: 18px 4px 0; }
+  .foot a { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .controls { grid-template-columns: 1fr; }
+    .strip li { width: 14px; height: 14px; }
+  }
+  @media (prefers-reduced-motion: no-preference) { .card { transition: transform .15s; } .card:hover { transform: translateY(-2px); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Groundhog Day Predictor Search</h1>
+  <p class="intro">Look up a prognosticator by name, place or type of creature, and see how their predictions have gone year by year.</p>
+
+  <form class="controls" role="search" onsubmit="return false">
+    <div class="field">
+      <label for="q">Name or city</label>
+      <input id="q" type="search" placeholder="e.g. Phil, Wiarton, Chuck" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="region">State or province</label>
+      <select id="region"><option value="">All</option></select>
+    </div>
+    <div class="field">
+      <label for="type">Type of creature</label>
+      <select id="type"><option value="">All</option></select>
+    </div>
+  </form>
+
+  <div class="bar">
+    <div class="count" id="count" role="status" aria-live="polite"></div>
+    <div class="bar-right">
+      <label for="sort" style="color:var(--muted)">Sort</label>
+      <select id="sort">
+        <option value="name">A–Z</option>
+        <option value="most">Most predictions</option>
+        <option value="recent">Most recent prediction</option>
+      </select>
+      <button class="reset" id="reset" type="button">Reset</button>
+    </div>
+  </div>
+
+  <div class="legend" aria-hidden="true">
+    <span><i class="y-shadow" style="width:14px;height:14px;border-radius:4px;display:inline-block"></i> Saw shadow (6 more weeks of winter)</span>
+    <span><i class="y-noshadow" style="width:14px;height:14px;border-radius:4px;display:inline-block"></i> No shadow (early spring)</span>
+    <span><i class="y-na" style="width:14px;height:14px;border-radius:4px;display:inline-block"></i> Prediction not recorded</span>
+    <span><i class="y-none" style="width:14px;height:14px;border-radius:4px;display:inline-block;border:2px solid #e6dcde"></i> No entry that year</span>
+  </div>
+
+  <ul class="results" id="results"></ul>
+
+  <p class="foot">Data: <a href="https://groundhog-day.com" target="_blank" rel="noopener">groundhog-day.com</a>. The dataset records each predictor's call (shadow or no shadow), not the actual weather that followed, so "Agreed with the crowd" compares a predictor to the majority of all predictors that year (years with at least 5 recorded calls). It is not a measure of forecast accuracy.</p>
+</div>
+
+<script>
+(function () {
+  var DATA_URL = "data/predictions.csv";
+  var MIN_CROWD = 5;
+  var $ = function (id) { return document.getElementById(id); };
+  var predictors = [], minYear, maxYear;
+
+  // Minimal RFC 4180 CSV parser (handles quoted fields with commas and newlines)
+  function parseCSV(text) {
+    var rows = [], row = [], f = "", q = false, i, c;
+    for (i = 0; i < text.length; i++) {
+      c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; }
+        else f += c;
+      } else if (c === '"') q = true;
+      else if (c === ",") { row.push(f); f = ""; }
+      else if (c === "\n") { row.push(f.replace(/\r$/, "")); rows.push(row); row = []; f = ""; }
+      else f += c;
+    }
+    if (f || row.length) { row.push(f); rows.push(row); }
+    var head = rows.shift();
+    return rows.filter(function (r) { return r.length === head.length; }).map(function (r) {
+      var o = {}; head.forEach(function (h, k) { o[h] = r[k]; }); return o;
+    });
+  }
+
+  function build(rows) {
+    var byId = {}, crowd = {};
+    rows.forEach(function (r) {
+      var y = +r.year;
+      var p = byId[r.id] || (byId[r.id] = {
+        id: r.id, name: r.name, city: r.city, region: r.region, country: r.country,
+        type: r.type, active: r.active === "1", description: r.description,
+        source: r.source, years: {}
+      });
+      p.years[y] = r.shadow === "1" ? "S" : r.shadow === "0" ? "N" : "?";
+      if (r.shadow === "1" || r.shadow === "0") {
+        var c = crowd[y] || (crowd[y] = { s: 0, n: 0 });
+        r.shadow === "1" ? c.s++ : c.n++;
+      }
+      minYear = minYear === undefined ? y : Math.min(minYear, y);
+      maxYear = maxYear === undefined ? y : Math.max(maxYear, y);
+    });
+    return Object.keys(byId).map(function (id) {
+      var p = byId[id], ys = Object.keys(p.years).map(Number).sort(function (a, b) { return a - b; });
+      var s = 0, n = 0, agree = 0, graded = 0;
+      ys.forEach(function (y) {
+        var v = p.years[y]; if (v === "?") return;
+        v === "S" ? s++ : n++;
+        var c = crowd[y];
+        if (c && c.s + c.n >= MIN_CROWD && c.s !== c.n) {
+          graded++;
+          if ((c.s > c.n) === (v === "S")) agree++;
+        }
+      });
+      p.entries = ys.length; p.recorded = s + n; p.shadow = s; p.noShadow = n;
+      p.agree = agree; p.graded = graded;
+      p.first = ys[0]; p.last = ys[ys.length - 1];
+      p.loc = [p.city, p.region].filter(Boolean).join(", ");
+      p.hay = (p.name + " " + p.city + " " + p.region).toLowerCase();
+      return p;
+    });
+  }
+
+  function fillSelect(sel, values) {
+    var counts = {};
+    values.forEach(function (v) { counts[v] = (counts[v] || 0) + 1; });
+    Object.keys(counts).sort().forEach(function (v) {
+      var o = document.createElement("option");
+      o.value = v; o.textContent = v + " (" + counts[v] + ")"; sel.appendChild(o);
+    });
+  }
+
+  function pct(a, b) { return b ? Math.round(100 * a / b) + "%" : "–"; }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+  function stat(label, value, sub) {
+    var box = el("div", "stat"), dt = el("dt", null, label), dd = el("dd", null, value);
+    if (sub) { dd.appendChild(document.createTextNode(" ")); dd.appendChild(el("small", null, sub)); }
+    box.appendChild(dt); box.appendChild(dd); return box;
+  }
+
+  function card(p) {
+    var li = el("li", "card");
+    li.appendChild(el("h2", null, p.name));
+    li.appendChild(el("p", "where", p.loc + (p.country ? " (" + p.country + ")" : "")));
+    var pills = el("div", "pills");
+    pills.appendChild(el("span", "pill", p.type));
+    pills.appendChild(el("span", "pill" + (p.active ? "" : " off"), p.active ? "Active" : "Inactive"));
+    li.appendChild(pills);
+
+    var dl = el("dl", "stats");
+    dl.appendChild(stat("Years on record", String(p.entries), p.first + "–" + p.last));
+    dl.appendChild(stat("Saw shadow", pct(p.shadow, p.recorded), p.shadow + " of " + p.recorded));
+    dl.appendChild(stat("Agreed with the crowd", pct(p.agree, p.graded), p.graded ? p.agree + " of " + p.graded : "too few years"));
+    li.appendChild(dl);
+
+    var strip = el("ul", "strip");
+    strip.setAttribute("role", "img");
+    strip.setAttribute("aria-label", p.name + ": " + p.shadow + " shadow predictions and " + p.noShadow + " no-shadow predictions, " + p.first + " to " + p.last);
+    for (var y = minYear; y <= maxYear; y++) {
+      var v = p.years[y], cls, txt;
+      if (v === "S") { cls = "y-shadow"; txt = "saw shadow"; }
+      else if (v === "N") { cls = "y-noshadow"; txt = "no shadow"; }
+      else if (v === "?") { cls = "y-na"; txt = "prediction not recorded"; }
+      else { cls = "y-none"; txt = "no entry"; }
+      var cell = el("li", cls); cell.title = y + ": " + txt; strip.appendChild(cell);
+    }
+    li.appendChild(strip);
+    var lab = el("div", "strip-label"); lab.setAttribute("aria-hidden", "true");
+    lab.appendChild(el("span", null, String(minYear))); lab.appendChild(el("span", null, String(maxYear)));
+    li.appendChild(lab);
+
+    if (p.description) {
+      var d = el("details"), s = el("summary", null, "About " + p.name);
+      d.appendChild(s); d.appendChild(el("p", null, p.description));
+      if (/^https?:\/\//.test(p.source)) {
+        var a = el("a", null, "Prediction history source"); a.href = p.source; a.target = "_blank"; a.rel = "noopener";
+        var pp = el("p"); pp.appendChild(a); d.appendChild(pp);
+      }
+      li.appendChild(d);
+    }
+    return li;
+  }
+
+  function render() {
+    var q = $("q").value.trim().toLowerCase(), reg = $("region").value, typ = $("type").value, sort = $("sort").value;
+    var list = predictors.filter(function (p) {
+      return (!q || p.hay.indexOf(q) !== -1) && (!reg || p.region === reg) && (!typ || p.type === typ);
+    });
+    list.sort(function (a, b) {
+      if (sort === "most") return b.entries - a.entries || a.name.localeCompare(b.name);
+      if (sort === "recent") return b.last - a.last || a.name.localeCompare(b.name);
+      return a.name.localeCompare(b.name);
+    });
+    var out = $("results"); out.textContent = "";
+    $("count").textContent = list.length + " of " + predictors.length + " predictors";
+    if (!list.length) {
+      var e = el("li", "empty", "No predictors match. Try a shorter name or reset the filters.");
+      out.appendChild(e);
+    }
+    var frag = document.createDocumentFragment();
+    list.forEach(function (p) { frag.appendChild(card(p)); });
+    out.appendChild(frag);
+    postHeight();
+  }
+
+  // Tell a parent CMS page how tall the content is so the iframe can resize
+  function postHeight() {
+    if (window.parent === window) return;
+    window.parent.postMessage({ type: "groundhog-search-height", height: document.documentElement.scrollHeight }, "*");
+  }
+
+  var timer;
+  $("q").addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(render, 120); });
+  ["region", "type", "sort"].forEach(function (id) { $(id).addEventListener("change", render); });
+  $("reset").addEventListener("click", function () {
+    $("q").value = ""; $("region").value = ""; $("type").value = ""; $("sort").value = "name"; render(); $("q").focus();
+  });
+  window.addEventListener("resize", postHeight);
+  window.addEventListener("load", postHeight);
+
+  fetch(DATA_URL).then(function (r) {
+    if (!r.ok) throw new Error(r.status);
+    return r.text();
+  }).then(function (text) {
+    predictors = build(parseCSV(text));
+    fillSelect($("region"), predictors.map(function (p) { return p.region; }).filter(Boolean));
+    fillSelect($("type"), predictors.map(function (p) { return p.type; }).filter(Boolean));
+    render();
+  }).catch(function () {
+    var li = el("li", "error", "Sorry, the data could not be loaded. Please try again later.");
+    $("results").appendChild(li); $("count").textContent = ""; postHeight();
+  });
+})();
+</script>
+</body>
+</html>
