@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Above the Fold: The Daily Real-or-Fake Headline Game</title>
+<meta name="description" content="Read a short summary of a real Daily Nebraskan story and pick the headline the paper actually ran. A new edition every morning.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #222;
+    --body: #333;
+    --muted: #6b6b6b;
+    --nav: #333;
+    --red: #ba1f1f;
+    --red-dark: #8f1717;
+    --line: #d9d9d9;
+    --paper: #fff;
+    --wash: #f4f4f4;
+    --good: #2e7d32;
+    --good-bg: #e6f4e7;
+    --bad: #ba1f1f;
+    --bad-bg: #fbe9e9;
+    --font: "Open Sans", "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--paper); color: var(--body); font: 16px/1.55 var(--font); }
+  a { color: var(--red); }
+  button { font: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+
+  /* utility strip */
+  .util { background: var(--wash); border-bottom: 1px solid var(--line); font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .util-in { max-width: 1000px; margin: 0 auto; padding: 8px 16px; display: flex; justify-content: space-between; gap: 12px; }
+  .util span { color: var(--muted); }
+
+  /* masthead */
+  .mast { text-align: center; padding: 22px 16px 18px; border-bottom: 3px solid var(--red); }
+  .mast h1 { margin: 0; font-size: clamp(2.1rem, 8vw, 3.4rem); font-weight: 800; letter-spacing: -.03em; line-height: 1; color: #000; }
+  .mast p { margin: 8px 0 0; font-size: .85rem; color: var(--muted); }
+
+  /* nav */
+  .nav { background: var(--nav); }
+  .nav-in { max-width: 1000px; margin: 0 auto; padding: 0 8px; display: flex; flex-wrap: wrap; }
+  .nav button { background: none; border: 0; color: #fff; font-size: .85rem; font-weight: 700; padding: 11px 12px; }
+  .nav button:hover, .nav button[aria-current="true"] { background: #1f1f1f; box-shadow: inset 0 -3px 0 var(--red); }
+  .nav button:focus-visible { outline-color: #fff; outline-offset: -3px; }
+
+  /* layout */
+  .page { max-width: 1000px; margin: 0 auto; padding: 20px 16px 40px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: start; }
+  .bar { background: var(--red); color: #fff; font-size: .8rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 7px 14px; display: flex; justify-content: space-between; gap: 10px; }
+
+  /* story */
+  .story { border: 1px solid var(--line); border-top: 0; padding: 20px 20px 22px; }
+  .kicker { color: var(--red); font-weight: 800; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 6px; }
+  .slot { display: flex; flex-direction: column; gap: 7px; margin: 0 0 14px; }
+  .slot i { display: block; height: 14px; background: #e3e3e3; border-radius: 2px; }
+  .slot i:nth-child(1) { width: 92%; } .slot i:nth-child(2) { width: 61%; }
+  .slot-label { font-size: .75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 0 0 8px; }
+  .dateline { font-weight: 800; font-size: .9rem; color: var(--ink); }
+  .excerpt { font-size: 1.08rem; line-height: 1.65; margin: 0 0 20px; color: var(--ink); }
+  .reveal .src { font-size: .85rem; font-weight: 700; margin-top: 8px; }
+  .prompt { font-weight: 800; font-size: .95rem; margin: 0 0 10px; color: #000; }
+
+  .choices { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .choice { width: 100%; text-align: left; display: flex; gap: 14px; align-items: flex-start; background: #fff; color: var(--ink); border: 2px solid var(--line); border-radius: 4px; padding: 14px 14px; font-weight: 700; font-size: 1.02rem; line-height: 1.35; }
+  .choice .ltr { flex: none; width: 28px; height: 28px; display: grid; place-items: center; background: var(--nav); color: #fff; font-size: .85rem; font-weight: 800; }
+  .choice:hover:not(:disabled) { border-color: var(--red); background: #fff8f8; }
+  .choice:disabled { cursor: default; }
+  .choice.right { border-color: var(--good); background: var(--good-bg); }
+  .choice.right .ltr { background: var(--good); }
+  .choice.wrong { border-color: var(--bad); background: var(--bad-bg); }
+  .choice.wrong .ltr { background: var(--bad); }
+  .choice.dim { opacity: .55; }
+  .tag { margin-left: auto; flex: none; font-size: .7rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; color: #fff; }
+  .right .tag { background: var(--good); } .wrong .tag { background: var(--bad); }
+
+  .reveal { margin-top: 16px; border-left: 4px solid var(--red); background: var(--wash); padding: 12px 14px; }
+  .reveal strong { display: block; font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--red); }
+  .reveal p { margin: 4px 0 0; color: var(--ink); }
+  .next { margin-top: 14px; background: var(--red); color: #fff; border: 0; font-weight: 800; padding: 12px 22px; border-radius: 4px; }
+  .next:hover { background: var(--red-dark); }
+
+  /* results */
+  .score { text-align: center; padding: 10px 0 4px; }
+  .score .big { font-size: 3.4rem; font-weight: 800; color: #000; line-height: 1; letter-spacing: -.03em; }
+  .score .rank { font-size: 1.15rem; font-weight: 800; color: var(--red); margin: 6px 0 2px; }
+  .squares { font-size: 1.8rem; letter-spacing: .15em; margin: 8px 0; }
+  .btnrow { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 14px 0 4px; }
+  .btn { border: 2px solid var(--red); background: var(--red); color: #fff; font-weight: 800; padding: 10px 20px; border-radius: 4px; }
+  .btn.alt { background: #fff; color: var(--red); }
+  .btn:hover { background: var(--red-dark); color: #fff; border-color: var(--red-dark); }
+  .toast { text-align: center; font-weight: 700; color: var(--good); min-height: 1.5em; margin: 6px 0 0; }
+  .recap { margin: 18px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+  .recap li { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .95rem; }
+  .recap .mark { flex: none; width: 22px; font-weight: 800; }
+  .recap .ok { color: var(--good); } .recap .no { color: var(--bad); }
+  .next-edition { text-align: center; color: var(--muted); font-size: .9rem; margin: 14px 0 0; }
+
+  /* sidebar */
+  .side { display: grid; gap: 22px; }
+  .panel { border: 1px solid var(--line); border-top: 0; }
+  .trend { list-style: none; margin: 0; padding: 0; }
+  .trend li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-bottom: 1px solid var(--line); font-size: .9rem; font-weight: 600; line-height: 1.35; }
+  .trend li:last-child { border-bottom: 0; }
+  .num { flex: none; width: 24px; height: 24px; background: var(--red); color: #fff; font-weight: 800; font-size: .8rem; display: grid; place-items: center; }
+  .trend .pending { color: var(--muted); font-weight: 400; font-style: italic; }
+  .trend .ok .num { background: var(--good); } .trend .no .num { background: #777; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; padding: 14px 6px; }
+  .stats b { display: block; font-size: 1.5rem; font-weight: 800; color: #000; line-height: 1.1; }
+  .stats span { font-size: .68rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+  .how { padding: 6px 16px 14px; font-size: .9rem; }
+  .how ol { padding-left: 20px; margin: 8px 0; } .how li { margin: 4px 0; }
+
+  .foot { border-top: 1px solid var(--line); background: var(--wash); color: var(--muted); font-size: .78rem; padding: 18px 16px; text-align: center; }
+  .foot p { max-width: 720px; margin: 0 auto; }
+
+  dialog { border: 0; padding: 0; max-width: min(480px, calc(100vw - 32px)); width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.35); color: var(--body); }
+  dialog::backdrop { background: rgba(0,0,0,.55); }
+  dialog .bar { align-items: center; }
+  dialog .x { background: none; border: 0; color: #fff; font-size: 1.3rem; line-height: 1; padding: 0 4px; }
+  dialog .x:focus-visible { outline-color: #fff; }
+  dialog .body { padding: 6px 18px 18px; }
+
+  @media (max-width: 800px) {
+    .page { grid-template-columns: 1fr; gap: 22px; padding-top: 14px; }
+    .story { padding: 16px; }
+  }
+  @media (max-width: 420px) { .util-in span:last-child { display: none; } }
+  @media (prefers-reduced-motion: no-preference) {
+    .choice { transition: background .12s, border-color .12s; }
+    .reveal, .story .score { animation: rise .25s ease-out; }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+</head>
+<body>
+
+<div class="util"><div class="util-in"><strong>Real Daily Nebraskan headlines &mdash; a fan-made game</strong><span id="today"></span></div></div>
+
+<header class="mast">
+  <h1>Above the Fold</h1>
+  <p>One Real DN headline. Two Fakes. For students, professors and anyone awake before their 8 a.m.</p>
+</header>
+
+<nav class="nav" aria-label="Game menu">
+  <div class="nav-in">
+    <button type="button" id="navPlay" aria-current="true">Today&rsquo;s Edition</button>
+    <button type="button" id="navHow">How to Play</button>
+    <button type="button" id="navStats">Stats</button>
+  </div>
+</nav>
+
+<main class="page">
+  <section aria-label="Game">
+    <div class="bar"><span id="barLeft">Story 1 of 3</span><span id="barRight">Edition No. 1</span></div>
+    <div class="story" id="story" aria-live="polite"></div>
+  </section>
+
+  <aside class="side" aria-label="Today's front page and stats">
+    <div>
+      <div class="bar">Front Page</div>
+      <div class="panel"><ol class="trend" id="trend"></ol></div>
+    </div>
+    <div>
+      <div class="bar">Your Record</div>
+      <div class="panel"><div class="stats" id="stats"></div></div>
+    </div>
+    <div>
+      <div class="bar">How to Play</div>
+      <div class="panel how">
+        <ol>
+          <li>Read the summary of a real Daily Nebraskan story. The headline has been removed.</li>
+          <li>Tap the headline you think is <strong>real</strong>.</li>
+          <li>Three stories a day. Come back tomorrow.</li>
+        </ol>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<footer class="foot"><p>Each round uses a story that was actually published by <a href="https://www.dailynebraskan.com/" target="_blank" rel="noopener">The Daily Nebraskan</a>. The real headline is quoted as published; the story summaries are our own, and the two fake headlines are invented for fun. Any people, mascots or squirrels named in a fake headline are in on the joke, and none of it happened. Read the full original after each answer. Above the Fold is an independent student project and is not affiliated with or endorsed by The Daily Nebraskan.</p></footer>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <div class="bar"><span id="dlgTitle"></span><button class="x" type="button" id="dlgClose" aria-label="Close">&times;</button></div>
+  <div class="body" id="dlgBody"></div>
+</dialog>
+
+<script>
+/* ------------------------------------------------------------------
+   PUZZLES  (all preset)
+   Each: section, path (Daily Nebraskan article URL path), excerpt (our own paraphrase of the story),
+   3 headlines (one is the REAL published headline, verbatim; two are invented decoys),
+   `answer` = index of the REAL one, reveal = punchline shown afterward.
+   Three puzzles make one daily edition: edition N uses puzzles 3N .. 3N+2 (wrapping around).
+   To add more, just append objects to this array in groups of three.
+------------------------------------------------------------------- */
+const PUZZLES = [
+  /* --- Edition 1 --- */
+  { section: "News", path: "/news/cornelius-turns-up-for-his-first-birthday/article_3ed5e227-da43-4917-b2b3-60df4174de8a.html",
+    excerpt: "The university’s AI chatbot turned one this week, and the Office of Undergraduate Education and Student Success marked the occasion by lining the Nebraska Union’s Corn Crib with cakes and candles. The actual birthday landed on Election Day, but staff decided it deserved a party anyway.",
+    headlines: [
+      "Cornelius escapes the Corn Crib, spotted running around City Campus",
+      "Herbie Husker crashes Cornelius’s birthday, eats the entire cake",
+      "Cornelius turns up for his first birthday"
+    ], answer: 2, reveal: "Yes, a chatbot got a birthday party with cake. Nobody has confirmed whether it blew out the candles or just processed them." },
+
+  { section: "News", path: "/news/breaking-squirrel-causes-power-outage-in-different-parts-of-campus/article_b599660c-8b03-11ef-aba9-b3c76ae5bc73.html",
+    excerpt: "Parts of campus and the surrounding area lost power around 8:30 on a weekday morning. The local utility traced the outage to a very small culprit that got too close to a transformer. Power was back by late morning.",
+    headlines: [
+      "BREAKING: Squirrel causes power outage in different parts of campus",
+      "BREAKING: Herbie Husker’s golf cart blamed for power outage across City Campus",
+      "BREAKING: Matt Waite’s drone blamed for power outage on City Campus"
+    ], answer: 0, reveal: "Nature’s tiniest saboteur strikes again. Power was back before lunch." },
+
+  { section: "News", path: "/news/what-was-the-green-liquid-in-kiewit-hall/article_322b1e5f-c0fa-4572-873f-63c187f5a57b.html",
+    excerpt: "A bright green substance spilled across the basement floor of an engineering building on a Wednesday afternoon, and everyone inside was evacuated. The university explained it was a food-grade, non-toxic antifreeze that keeps heating and cooling pipes from bursting. A spokesperson said he had never seen it happen before.",
+    headlines: [
+      "Squirrels suspected in Kiewit Hall spill; engineering students “not surprised”",
+      "Cornelius blamed after Kiewit Hall evacuation: “I only suggested it”",
+      "What was the green liquid in Kiewit Hall?"
+    ], answer: 2, reveal: "It was antifreeze for the HVAC pipes. Disappointingly, not slime." },
+
+  /* --- Edition 2 --- */
+  { section: "Opinion", path: "/opinion/the-truth-about-the-tunnels-underneath-campus/article_79d4b01a-5906-4084-9069-da0edcbf9af3.html",
+    excerpt: "Most students cross campus every day without realizing a network of tunnels runs right beneath their feet. Rumors about them have circulated for years, from ghost stories to questions about whether students are even allowed down there. This piece separates the rumors from the real story.",
+    headlines: [
+      "I followed a squirrel into the tunnels under campus and came back different",
+      "The truth about the tunnels underneath campus",
+      "Why Herbie Husker is definitely living in the tunnels beneath campus"
+    ], answer: 1, reveal: "Only the tunnels connected to Harper-Schramm-Smith are open to students. The ghost stories remain unconfirmed." },
+
+  { section: "News", path: "/news/university-of-nebraska-lincoln-to-replace-love-library-dunkin-in-2027/article_ee302f47-dc6b-4009-bfb8-052fabcb7621.html",
+    excerpt: "The last remaining Dunkin’ on campus, tucked inside the library’s learning commons, is on its way out. The dean of libraries announced it will be replaced by a cafe run by the university’s own dining services in early 2027, which means more local control of the menu, more money staying on campus and, best of all, meal plans accepted. Students will be asked for input on what goes on the menu.",
+    headlines: [
+      "Squirrels stage sit-in to save Love Library Dunkin’ munchkins",
+      "QB Anthony Colandrea storms Love Library to protest Dunkin’ closing, throws a perfect spiral at the sign",
+      "University of Nebraska-Lincoln to replace Love Library Dunkin’ in 2027"
+    ], answer: 2, reveal: "The library is breaking up with Dunkin’. The new cafe takes your meal plan, which is the only love story that matters." },
+
+  { section: "News", path: "/news/students-sleep-in-a-fountain-for-social-experiment/article_efd6cb3c-f6e4-11e5-8f77-0f3bd0672a55.html",
+    excerpt: "On a Wednesday afternoon, the usual chalk drawings around the fountain outside the Nebraska Union were joined by something new: students lying down for a nap. They were in an intro sociology class studying deviance, and their instructor wanted them to try it firsthand. The class dozed for 20 minutes while the instructor recorded how passersby reacted. One freshman said it started as a flash mob.",
+    headlines: [
+      "Matt Rhule found napping in Broyhill Fountain, says he’s “just avoiding the next game”",
+      "Students sleep in a fountain for social experiment",
+      "Professor assigns fountain nap as extra credit, dean “aware of the situation”"
+    ], answer: 1, reveal: "Twenty minutes of napping in the name of sociology. Extra credit for commitment. The rest of campus was just trying to get to class." },
+
+  /* --- Edition 3 --- */
+  { section: "News", path: "/news/nebraska-fans-bought-more-than-4-million-of-alcohol-in-memorial-stadium/article_a9c341c9-fa10-4356-a188-36c37d5f1e9f.html",
+    excerpt: "Nebraska was the last Big Ten school to sell alcohol at football games, and after its first full season, a public records request shows what fans did with the opportunity. The stadium’s sell-out crowds brought in more than $4 million, and fans bought over 400,000 units in total.",
+    headlines: [
+      "Fans’ stadium drink tab could have bought every UNL student a textbook, report says",
+      "Nebraska fans bought more than $4 million of alcohol in Memorial Stadium",
+      "Squirrels spotted stealing nachos in Memorial Stadium, fans “mostly fine with it”"
+    ], answer: 1, reveal: "423,519 drinks in a single season. The Sea of Red was thirsty." },
+
+  { section: "News", path: "/news/unl-students-rejoice-at-d-p-dough-comeback-amid-management-shifts-lawsuit/article_28db998c-94d2-11ef-9513-4b161ff20a36.html",
+    excerpt: "A late-night calzone spot that students mourned when it closed last spring is back just in time for Halloween weekend, this time as a corporate-run location after a lawsuit against the previous franchisees. One senior called it the best food to have at 3 a.m.",
+    headlines: [
+      "D.P. Dough reopens, immediately runs out of calzones at 2:59 a.m.",
+      "Little Red spotted in D.P. Dough line at 2 a.m., “just here for the calzone”",
+      "UNL students rejoice at D.P. Dough comeback amid management shifts, lawsuit"
+    ], answer: 2, reveal: "The calzones have returned. Late-night decisions have never looked better." },
+
+  { section: "News", path: "/news/which-campus-water-bottle-refilling-station-has-saved-the-most-bottles/article_227dee53-491f-439b-846d-75a95bd3aefc.html",
+    excerpt: "Campus refill stations come with a little screen that counts how many disposable bottles each one has saved. A reporter walked City Campus checking the numbers to find out which spot in the building lineup has quietly done the most good.",
+    headlines: [
+      "Which campus water fountain tastes the least like a basement? A ranking",
+      "Which campus water bottle refilling station has saved the most bottles?",
+      "Squirrels blamed for dry refill station in Love Library, students “thirsty”"
+    ], answer: 1, reveal: "A very important investigation, conducted on foot, one little counter at a time." },
+
+  /* --- Edition 4 --- */
+  { section: "News", path: "/news/world-champion-baton-twirler-joins-cornhusker-marching-band/article_9ec8549b-490d-433f-bbe7-a6f2e23f6283.html",
+    excerpt: "As a three-year-old in Omaha, she watched a baton twirling and dance studio out the car window on every ride to daycare, until her mother finally looked into it. Years later, she is a world champion at the sport, and she has just joined a big college marching band.",
+    headlines: [
+      "World champion pogo-stick jumper joins Cornhusker Marching Band",
+      "World champion baton twirler joins Cornhusker Marching Band",
+      "Little Red steals baton at pregame show, band director “not amused”"
+    ], answer: 1, reveal: "Every drive to daycare was apparently scouting." },
+
+  { section: "Campus Life", path: "/culture/students-compete-in-mr-beast-inspired-husker-games/article_4b72e96d-2312-4b98-9a33-fa36d4c6ae45.html",
+    excerpt: "As part of homecoming week, nearly 80 students took on nine challenges that tested memory, speed and teamwork, in a contest modeled on a popular streaming competition show. A student from Nebraska who actually competed on that show hosted the event on the fields.",
+    headlines: [
+      "Husker Games winner receives a parking pass, riot narrowly avoided",
+      "Herbie Husker disqualified from Husker Games for “mascot privileges”",
+      "Students compete in Mr. Beast inspired Husker Games"
+    ], answer: 2, reveal: "Nine challenges, 80 students and one very Nebraska take on a streaming show." },
+
+  { section: "Opinion", path: "/opinion/column-what-ever-happened-to-spoiler-alerts/article_af57f40b-720c-4202-900f-23709f29b8c0.html",
+    excerpt: "A columnist laments that avoiding spoilers online has become basic internet survival, and that nobody warns anyone anymore. One careless TikTok comment, the writer argues, can steal the shock of a season finale or the end of a movie you have been waiting to see.",
+    headlines: [
+      "COLUMN: What ever happened to spoiler alerts?",
+      "COLUMN: The group chat was a mistake, and your 2 a.m. spoilers prove it",
+      "COLUMN: Anthony Colandrea highlight reels are the only spoilers I welcome"
+    ], answer: 0, reveal: "The columnist spoiled several shows in the same column, but did warn you at the top. Progress." },
+
+  /* --- Edition 5 --- */
+  { section: "Opinion", path: "/opinion/dear-archie-i-forgot-to-study-for-my-exam-can-i-still-pass/article_e2a17b55-2a17-42f8-9539-a47d949db24b.html",
+    excerpt: "A bronze mammoth outside Morrill Hall is said to bring good luck if you rub his foot, and students stop by before midterms, finals and home football games. This advice-style piece answers a student’s exam panic on his behalf.",
+    headlines: [
+      "Archie’s foot is now shinier than most students’ GPAs, new count shows",
+      "Dear Archie, I forgot to study for my exam. Can I still pass?",
+      "Squirrels caught polishing Archie’s foot, “finals luck” cited"
+    ], answer: 1, reveal: "Archie’s official answer is a very firm statue silence." },
+
+  { section: "Campus Life", path: "/culture/find-your-new-favorite-study-spot-at-the-mill/article_14aa23dc-c2d7-446f-abb4-e1bac4e1adb0.html",
+    excerpt: "A locally owned roastery with five locations around Lincoln, one of them tucked inside a radio station, gets a spotlight as a place students might actually enjoy studying. The writer recommends one location in particular for the full experience.",
+    headlines: [
+      "Find your new favorite place to cry quietly between classes",
+      "Adam Wagler holds office hours at the Mill, students order the “B+ latte”",
+      "Find your new favorite study spot at the Mill"
+    ], answer: 2, reveal: "Yes, one location really is inside a radio station. Study at your own risk of being on air." },
+
+  { section: "Campus Life", path: "/culture/lincoln-cargo-container-coffee-shop-serves-drinks-with-eco-friendly-flair/article_fc6b61ef-067e-4e63-8650-8b8ffc2aedcb.html",
+    excerpt: "One of Lincoln’s newest coffee spots lives inside a repurposed shipping container. When it opened in the spring, the owner was the only person behind the counter, and the shop’s regulars have grown steadily since.",
+    headlines: [
+      "Squirrels plan coffee shop heist in Lincoln, make off with 40 pounds of beans",
+      "Lincoln cargo container coffee shop serves drinks with eco-friendly flair",
+      "Lincoln coffee spot opens in old phone booth, seats exactly one overworked grad student"
+    ], answer: 1, reveal: "A coffee shop in a shipping container. Somehow the most Lincoln thing on this list." },
+
+  /* --- Edition 6 --- */
+  { section: "News", path: "/news/from-lost-keys-to-wedding-rings-unlpd-has-it-all/article_70b870ed-5476-4f1b-bddb-fbf8d45aba6d.html",
+    excerpt: "On a campus of more than 20,000 students, people lose things all the time, and a lot of it ends up at the campus police department for safekeeping. The department keeps a surprisingly thorough catalog of found items waiting to be claimed, including some very important ones.",
+    headlines: [
+      "UNLPD lost and found holds 400 water bottles, zero textbooks, one confused mannequin",
+      "UNLPD recovers Herbie Husker’s head, mascot “relieved”",
+      "From lost keys to wedding rings, UNLPD has it all"
+    ], answer: 2, reveal: "Please check for your wedding ring. Please also check for your keys." },
+
+  { section: "Sports", path: "/sports/nebraska-soccer-draws-usc-for-a-record-breaking-fifth-straight-scoreless-draw/article_2d52f7cb-a0a4-4420-888e-eea26c461053.html",
+    excerpt: "The Husker soccer team played to a 0-0 tie at home, its fifth straight scoreless draw and 10th of the season. The team has gone more than 450 minutes without scoring but over 540 without giving up a goal, and a record for scoreless draws fell in the process.",
+    headlines: [
+      "Nebraska soccer announces goal-scoring office hours after fifth straight shutout",
+      "Squirrel steals ball in USC match, scores first goal of the month",
+      "Nebraska soccer draws USC for a record-breaking fifth straight scoreless draw"
+    ], answer: 2, reveal: "Five 0-0 ties in a row. The NCAA record book had to make room for peak defense." },
+
+  { section: "News", path: "/news/subway-steak-n-shake-leaving-nebraska-union-among-other-dining-changes/article_93b3ec59-9e92-4678-89cb-83a3252abe0b.html",
+    excerpt: "Two fast-food names will leave the Nebraska Union by fall. One restaurant will close permanently, and its space will go to a popular chicken sandwich chain that needs more room for high sales and catering. The housing and dining team said the departing brand had been successful, just not as successful as some others.",
+    headlines: [
+      "Nebraska Union dining shake-up leaves students with vending machines and hope",
+      "Cornelius seen running around Nebraska Union taking orders after Subway's exit",
+      "Subway, Steak 'n Shake leaving Nebraska Union among other dining changes"
+    ], answer: 2, reveal: "Steak ’n Shake did very well. Chick-fil-A did even better, and needed the room." },
+
+  /* --- Edition 7 --- */
+  { section: "Campus Life", path: "/culture/college-takeover-night-lincoln-children-s-museum-without-the-kids/article_d682906b-8a4b-4fd4-89d9-1e55d6dff453.html",
+    excerpt: "Just in time for Halloween, a children’s museum is opening its doors to adults for a three-hour, screen-free evening. It is the museum’s first event for people 18 and over since 2019, and students are specifically invited.",
+    headlines: [
+      "Children’s Museum offers nap hour for sleep-deprived college students",
+      "College takeover night: Lincoln Children’s Museum without the kids",
+      "Herbie Husker hosts Children’s Museum after-hours, “no kids” rule enforced by squirrels"
+    ], answer: 1, reveal: "Adults only, screens off, exhibits on. The ball pit remains unconfirmed." },
+
+  { section: "News", path: "/news/convenience-comes-at-a-cost-how-herbie-s-market-prices-differ-from-walmart/article_43a282cb-c177-4eb4-bfb6-6c10d389c19b.html",
+    excerpt: "Students grabbing a quick snack at the on-campus market may be paying more than they realize. A price comparison of 11 food items found the campus store averages more than double what a big-box retailer charges, a cost many students without cars end up paying.",
+    headlines: [
+      "Herbie Husker denies owning Herbie’s Market, “just a coincidence”",
+      "Herbie’s Market sells a single banana for the price of a textbook, study finds",
+      "Convenience comes at a cost: How Herbie’s Market prices differ from Walmart"
+    ], answer: 2, reveal: "Eleven items, more than twice the price. Your granola bar has a cover charge." },
+
+  { section: "Sports", path: "/sports/football/nebraska-football-prepares-for-latest-kickoff-in-years/article_d153f394-0ca2-4606-b040-4cb65a068a5b.html",
+    excerpt: "A game against Oregon was set for a 10 p.m. Central kickoff, one of the latest start times in school history. It falls just short of an 11:30 p.m. start against Hawaii in 1982. The Huskers have a roughly even record in games that begin at 9 p.m. or later.",
+    headlines: [
+      "Registrar denies excused absences for sleepy fans after 10 p.m. kickoff",
+      "Nebraska football prepares for latest kickoff in years",
+      "Matt Rhule shrugs off late kickoff: “Football doesn’t have a bedtime”"
+    ], answer: 1, reveal: "10 p.m. is a bedtime for many fans. Naps before kickoff were, presumably, strongly encouraged." },
+
+  /* --- Edition 8 --- */
+  { section: "Campus Life", path: "/culture/get-to-know-unl-s-most-beloved-street-musician/article_0f5aa647-823f-4f90-bc6a-44ce6fce6a96.html",
+    excerpt: "If you have ever stood in a long line outside a Huskers game in extreme heat or cold, you may have heard it: the cheerful chime of a xylophone from over your shoulder. The player, in a red shirt and khakis, has a donation bag and a laminated sign promising we all stick together in all kinds of weather.",
+    headlines: [
+      "Squirrels form backup band outside Memorial Stadium, demand tips in acorns",
+      "Matt Waite’s drone films street musician, accidentally makes him famous",
+      "Get to know UNL’s most beloved street musician"
+    ], answer: 2, reveal: "A xylophone man outside the arena is the real MVP of the line." },
+
+  { section: "Campus Life", path: "/culture/unl-geoguessr-club-pins-itself-on-the-map/article_af64024c-6e8e-45f2-8a85-64dbcc47bbde.html",
+    excerpt: "A new registered student group meets weekly to play a browser game that drops you at a random spot in the world on Street View and asks you to figure out where you are. Most students play head-to-head, and the winner is whoever guesses closest.",
+    headlines: [
+      "UNL Procrastination Club postpones first meeting, again",
+      "UNL Squirrel Watch Club tracks suspects across City Campus",
+      "UNL GeoGuessr Club pins itself on the map"
+    ], answer: 2, reveal: "The club’s official motto is probably “that looks like Brazil.”" },
+
+  { section: "News", path: "/news/campus/nebraska-union-chick-fil-a-extends-hours-allows-student-meal-swipes/article_e4c3296a-d893-4e06-8f46-e1efc84ae412.html",
+    excerpt: "The Nebraska Union’s chicken sandwich spot now stays open an hour later, from 6 to 7 p.m., so it can catch more of the dinner rush. The manager said students can also use their meal swipes there after 1 p.m.",
+    headlines: [
+      "Little Red and Herbie Husker spotted sharing nuggets at Nebraska Union Chick-fil-A",
+      "Chick-fil-A line stretches to Love Library as students cite “exam week hunger”",
+      "Nebraska Union Chick-fil-A extends hours, allows student meal swipes"
+    ], answer: 2, reveal: "One extra hour and a swipe. Dinner is looking up." }
+];
+
+/* ------------------------------------------------------------------
+   CONFIG / HELPERS
+------------------------------------------------------------------- */
+/* Fixed (preset) slot for each real headline, so answers are spread evenly across A/B/C
+   and no letter is a giveaway. Swaps the real headline into the target slot. */
+const SLOTS = [1,2,0, 2,2,1, 0,1,1, 0,0,2, 1,2,0, 2,0,0, 1,1,2, 0,1,2];
+PUZZLES.forEach((p, i) => {
+  const t = SLOTS[i % SLOTS.length];
+  if (t !== p.answer) { [p.headlines[t], p.headlines[p.answer]] = [p.headlines[p.answer], p.headlines[t]]; p.answer = t; }
+});
+
+const SITE = "https://www.dailynebraskan.com";
+const PER_EDITION = 3;
+const LAUNCH = new Date(2026, 10, 11);           // Edition No. 1 = Nov 11, 2026 (local time)
+const KEY = "atf-v1";
+const RANKS = ["Never Opened the Syllabus", "Passing, Technically", "Dean’s List", "Editor-in-Chief"];
+const LETTERS = ["A", "B", "C"];
+
+const $ = (id) => document.getElementById(id);
+const todayStr = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+function dayNumber(d = new Date()) {
+  const a = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  const b = Date.UTC(LAUNCH.getFullYear(), LAUNCH.getMonth(), LAUNCH.getDate());
+  return Math.max(0, Math.round((a - b) / 864e5));
+}
+function editionPuzzles(n) {
+  const total = Math.floor(PUZZLES.length / PER_EDITION);
+  const start = (n % total) * PER_EDITION;
+  return PUZZLES.slice(start, start + PER_EDITION);
+}
+
+/* storage (safe if blocked) */
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { /* ignore */ } }
+
+/* ------------------------------------------------------------------
+   STATE
+------------------------------------------------------------------- */
+const dayN = dayNumber();
+const today = todayStr();
+const edition = editionPuzzles(dayN);
+let store = load();
+store.stats = store.stats || { played: 0, wins: 0, streak: 0, best: 0, last: null, dist: [0, 0, 0, 0] };
+// progress for today: array of chosen indexes
+if (!store.today || store.today.date !== today) store.today = { date: today, picks: [], counted: false };
+let picks = store.today.picks.slice();       // chosen answer index per story
+let pending = null;                           // pick made on the current story that hasn't been advanced yet (display only)
+
+function correctCount() { return picks.reduce((n, p, i) => n + (p === edition[i].answer ? 1 : 0), 0); }
+
+/* ------------------------------------------------------------------
+   RENDER
+------------------------------------------------------------------- */
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+function renderTrend(current) {
+  $("trend").innerHTML = edition.map((p, i) => {
+    const done = i < picks.length;
+    const right = done && picks[i] === p.answer;
+    const cls = done ? (right ? "ok" : "no") : "";
+    const text = done ? esc(p.headlines[p.answer]) : `<span class="pending">${i === current ? "You’re reading this one" : "Not yet read"}</span>`;
+    return `<li class="${cls}"><span class="num">${i + 1}</span><span>${text}</span></li>`;
+  }).join("");
+}
+
+function renderStats() {
+  const s = store.stats;
+  const pct = s.played ? Math.round((s.wins / s.played) * 100) : 0;
+  $("stats").innerHTML = `
+    <div><b>${s.played}</b><span>Played</span></div>
+    <div><b>${pct}</b><span>Perfect %</span></div>
+    <div><b>${s.streak}</b><span>Streak</span></div>
+    <div><b>${s.best}</b><span>Best</span></div>`;
+}
+
+function renderStory(i, chosen) {
+  const p = edition[i];
+  const answered = chosen !== null && chosen !== undefined;
+  $("barLeft").textContent = `Story ${i + 1} of ${PER_EDITION}`;
+  $("barRight").textContent = `Edition No. ${dayN + 1}`;
+
+  const choices = p.headlines.map((h, k) => {
+    let cls = "choice", tag = "";
+    if (answered) {
+      if (k === p.answer) { cls += " right"; tag = `<span class="tag">Real</span>`; }
+      else if (k === chosen) { cls += " wrong"; tag = `<span class="tag">Fake</span>`; }
+      else cls += " dim";
+    }
+    return `<li><button type="button" class="${cls}" data-k="${k}" ${answered ? "disabled" : ""}>
+      <span class="ltr">${LETTERS[k]}</span><span>${esc(h)}</span>${tag}</button></li>`;
+  }).join("");
+
+  let after = "";
+  if (answered) {
+    const ok = chosen === p.answer;
+    const last = i === PER_EDITION - 1;
+    after = `<div class="reveal" role="status"><strong>${ok ? "Nailed it" : "Fooled you"}</strong><p>${esc(p.reveal)}</p>
+      <p class="src"><a href="${SITE}${p.path}" target="_blank" rel="noopener">Read the original in The Daily Nebraskan &rarr;</a></p></div>
+      <button type="button" class="next" id="next">${last ? "See my front page" : "Next story"}</button>`;
+  }
+
+  $("story").innerHTML = `
+    <p class="kicker">${esc(p.section)}</p>
+    <div class="slot" aria-hidden="true"><i></i><i></i></div>
+    <p class="slot-label">Headline removed</p>
+    <p class="excerpt">${esc(p.excerpt)}</p>
+    <p class="prompt" id="q">Which headline ran above the fold?</p>
+    <ul class="choices" role="group" aria-labelledby="q">${choices}</ul>
+    ${after}`;
+
+  renderTrend(i);
+}
+
+function renderResults() {
+  const n = correctCount();
+  $("barLeft").textContent = "Final Edition";
+  $("barRight").textContent = `Edition No. ${dayN + 1}`;
+  const squares = picks.map((p, i) => (p === edition[i].answer ? "🟩" : "🟥")).join("");
+  const recap = edition.map((p, i) => {
+    const ok = picks[i] === p.answer;
+    return `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "✗"}</span><span>${esc(p.headlines[p.answer])}</span></li>`;
+  }).join("");
+
+  $("story").innerHTML = `
+    <div class="score">
+      <div class="big">${n}/${PER_EDITION}</div>
+      <div class="rank">${RANKS[n]}</div>
+      <div class="squares" aria-label="${n} of ${PER_EDITION} correct">${squares}</div>
+      <div class="btnrow">
+        <button type="button" class="btn" id="share">Share results</button>
+        <button type="button" class="btn alt" id="again">Read an extra edition</button>
+      </div>
+      <p class="toast" id="toast" role="status"></p>
+    </div>
+    <ul class="recap" aria-label="The real headlines">${recap}</ul>
+    <p class="next-edition">Next edition drops at midnight. Now go to class.</p>`;
+  renderTrend(-1);
+  $("share").onclick = share;
+  $("again").onclick = () => startExtra(dayN + 1);
+  $("share").focus({ preventScroll: true });
+}
+
+/* ------------------------------------------------------------------
+   GAMEPLAY
+------------------------------------------------------------------- */
+function finishDaily() {
+  if (store.today.counted) return;
+  const s = store.stats, n = correctCount();
+  const yesterday = todayStr(new Date(Date.now() - 864e5));
+  s.streak = (s.last === yesterday) ? s.streak + 1 : 1;
+  s.best = Math.max(s.best, s.streak);
+  s.last = today;
+  s.played += 1;
+  if (n === PER_EDITION) s.wins += 1;
+  s.dist[n] = (s.dist[n] || 0) + 1;
+  store.today.counted = true;
+  save(store); renderStats();
+}
+
+let mode = { daily: true, set: edition, picks: null };
+
+function showCurrent() {
+  if (mode.daily) {
+    if (picks.length >= PER_EDITION) return renderResults();
+    pending = null;
+    renderStory(picks.length, null);
+  }
+}
+
+$("story").addEventListener("click", (e) => {
+  const choice = e.target.closest(".choice");
+  const next = e.target.closest("#next");
+  if (choice && !choice.disabled) {
+    const k = Number(choice.dataset.k);
+    if (mode.daily) {
+      const i = picks.length;
+      pending = k;
+      renderStory(i, k);
+      $("next").focus({ preventScroll: true });
+    } else extraPick(k);
+  } else if (next) {
+    if (mode.daily) {
+      picks.push(pending); pending = null;
+      store.today.picks = picks.slice(); save(store);
+      if (picks.length >= PER_EDITION) { finishDaily(); renderResults(); }
+      else { renderStory(picks.length, null); $("story").scrollIntoView({ block: "nearest" }); }
+    } else extraNext();
+  }
+});
+
+/* Extra edition: same flow, no stats */
+let ex = null;
+function startExtra(n) {
+  mode = { daily: false };
+  ex = { n, set: editionPuzzles(n), picks: [], pending: null };
+  extraRender();
+}
+function extraRender() {
+  const real = ex.set, backup = [edition, picks.slice()];
+  // reuse renderers by temporarily swapping the active set
+  edition.splice(0, edition.length, ...real);
+  picks = ex.picks.slice();
+  if (picks.length >= PER_EDITION) {
+    renderExtraResults();
+  } else {
+    renderStory(picks.length, ex.pending);
+    $("barRight").textContent = `Extra Edition`;
+  }
+  // restore the daily set
+  edition.splice(0, edition.length, ...backup[0]);
+  picks = backup[1];
+  if (!mode.daily) { /* picks restored; keep daily ones intact */ }
+}
+function extraPick(k) { ex.pending = k; extraRender(); const nx = $("next"); if (nx) nx.focus({ preventScroll: true }); }
+function extraNext() { ex.picks.push(ex.pending); ex.pending = null; extraRender(); }
+function renderExtraResults() {
+  const n = ex.picks.reduce((c, p, i) => c + (p === ex.set[i].answer ? 1 : 0), 0);
+  const squares = ex.picks.map((p, i) => (p === ex.set[i].answer ? "🟩" : "🟥")).join("");
+  const recap = ex.set.map((p, i) => {
+    const ok = ex.picks[i] === p.answer;
+    return `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "✗"}</span><span>${esc(p.headlines[p.answer])}</span></li>`;
+  }).join("");
+  $("barLeft").textContent = "Extra Edition";
+  $("barRight").textContent = "Just for fun";
+  $("story").innerHTML = `
+    <div class="score"><div class="big">${n}/${PER_EDITION}</div><div class="rank">${RANKS[n]}</div>
+    <div class="squares">${squares}</div>
+    <div class="btnrow"><button type="button" class="btn" id="again2">Another extra edition</button>
+    <button type="button" class="btn alt" id="back">Back to today</button></div></div>
+    <ul class="recap">${recap}</ul>
+    <p class="next-edition">Extra editions don’t count toward your streak.</p>`;
+  $("again2").onclick = () => startExtra(ex.n + 1);
+  $("back").onclick = () => { mode = { daily: true }; showCurrent(); };
+  renderTrend(-1);
+}
+
+/* share */
+function shareText() {
+  const squares = picks.map((p, i) => (p === edition[i].answer ? "🟩" : "🟥")).join("");
+  return `Above the Fold No. ${dayN + 1}\n${correctCount()}/${PER_EDITION} ${squares}\nRank: ${RANKS[correctCount()]}\nThink you can spot the real Daily Nebraskan headline?`;
+}
+async function share() {
+  const text = shareText();
+  try {
+    if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) { await navigator.share({ text }); return; }
+  } catch (e) { if (e && e.name === "AbortError") return; }
+  try { await navigator.clipboard.writeText(text); $("toast").textContent = "Copied to clipboard. Go brag."; }
+  catch (e) { $("toast").textContent = "Couldn’t copy. Here it is: " + text.replace(/\n/g, " | "); }
+}
+
+/* ------------------------------------------------------------------
+   DIALOGS + NAV
+------------------------------------------------------------------- */
+const dlg = $("dlg");
+function openDlg(title, html) { $("dlgTitle").textContent = title; $("dlgBody").innerHTML = html; if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); }
+$("dlgClose").onclick = () => dlg.close();
+dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+
+$("navPlay").onclick = () => { if (dlg.open) dlg.close(); mode = { daily: true }; showCurrent(); };
+$("navHow").onclick = () => openDlg("How to Play", `
+  <p><strong>Every morning, three short stories</strong> that The Daily Nebraskan actually published, each with its headline removed.</p>
+  <ol><li>Read the summary.</li><li>Pick the headline the paper <strong>actually ran</strong>. The other two are decoys.</li><li>See the answer, enjoy the punchline, move on.</li></ol>
+  <p>Finish all three to earn a rank, from <em>Never Opened the Syllabus</em> to <em>Editor-in-Chief</em>. New edition at midnight. Perfect for the walk to class, the lecture hall before the professor arrives, or your fifth minute of office hours.</p>
+  <p style="color:#6b6b6b;font-size:.85rem">Hint: the fake ones are trying very hard to sound believable. The real one is usually plainer, and sometimes weirder.</p>`);
+$("navStats").onclick = () => {
+  const s = store.stats, max = Math.max(1, ...s.dist);
+  const bars = s.dist.map((v, i) => `<div style="display:flex;gap:8px;align-items:center;margin:4px 0"><span style="width:28px;font-weight:700">${i}/3</span>
+    <div style="background:#ba1f1f;color:#fff;font-weight:700;padding:2px 8px;min-width:24px;width:${Math.max(8, (v / max) * 100)}%">${v}</div></div>`).join("");
+  openDlg("Your Record", `<div class="stats" style="padding:12px 0">
+    <div><b>${s.played}</b><span>Played</span></div><div><b>${s.played ? Math.round(s.wins / s.played * 100) : 0}</b><span>Perfect %</span></div>
+    <div><b>${s.streak}</b><span>Streak</span></div><div><b>${s.best}</b><span>Best</span></div></div>
+    <p style="font-weight:800;margin:8px 0 4px">Score breakdown</p>${bars}`);
+};
+
+/* ------------------------------------------------------------------
+   INIT
+------------------------------------------------------------------- */
+$("today").textContent = new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+renderStats();
+showCurrent();
+</script>
+</body>
+</html>
