@@ -54,11 +54,11 @@ Title screen ──► Fountain (free play, no timer)
 
 | Obstacle | Move | What happens if you hit it |
 |---|---|---|
-| Lime-style scooter lying across the lane | **Jump** | Stumble. The officer catches up. A second stumble within 6 s means you're caught. |
-| Group Therapy pedal bus | **Switch lanes** | Caught |
-| "Bid Day" banner strung between poles (one lane or all three) | **Slide** | Caught |
+| Rental e-scooter parked across the lane (white frame, green stem, black deck — no brand logo) | **Jump** | Stumble. The officer catches up. A second stumble within 6 s means you're caught. |
+| Lincoln city bus (navy back, green sides, orange cord stripe, "LINCOLN" + route number) | **Switch lanes** | Caught |
+| Giant inflatable tailgate corn-cob mascot standing with its legs apart (one lane, or three side by side) | **Slide** between its legs | Caught |
 
-**The slide obstacle:** a Bid Day banner fits Greek Row, and it naturally sits at head height. Other options if we want variety later: a low tailgate tent awning, a parking gate arm, or a low tree branch.
+**The slide obstacle:** we wanted Herbie Husker, but Herbie is the university's trademarked mascot, so the game uses an original stand-in: a giant inflatable corn-cob mascot in a "GO BIG RED" tee and red shorts, the kind of thing you'd see at a tailgate. If we ever get permission from UNL to use Herbie, `drawMascot()` is the one function to swap.
 
 - Bubbles float along the lanes as pickups, in the color you picked. The runner also leaves a trail of bubbles behind them, since they're still soapy.
 
@@ -103,12 +103,14 @@ Most of the message comes from how the game is built, not from text on screen.
 
 These would make the message stronger, and we need sources before putting them in:
 
-- [ ] Confirm the fountain's name/location (Broyhill Fountain, by the Nebraska Union) and that it's the one used in past soap incidents.
-- [ ] Ask UNL Facilities what a soap cleanup actually involves and what it costs (staff hours, water, parts). If they give numbers, add a "real cost" line to the Caught screen **with attribution**.
+- [x] Confirmed: Broyhill Fountain outside the Nebraska Union was soaped around 2 a.m. Sept. 5, 2026. Per the Daily Nebraskan (Paige Nickless, Sept. 15, 2026), it caused thousands of dollars in damage, the fountain was drained and refilled, and the filter was replaced. Interim UNLPD Chief Marty Fehringer was quoted on the cost. Summarized and linked on the "Why this game?" screen.
+- [ ] Ask UNL Facilities for an exact dollar figure for the Sept. 5 cleanup. If they give one, add a "real cost" line to the Caught screen **with attribution**.
 - [ ] Ask UNLPD what charge usually applies (likely criminal mischief, Neb. Rev. Stat. 28-519, where the penalty depends on the damage amount) and whether anyone has been cited for it.
 - [ ] Ask Student Conduct whether this leads to a conduct referral.
-- [ ] Check Daily Nebraskan archives for past fountain-soap stories to link from the "Why" screen.
-- [ ] Decide whether to keep the real names "Group Therapy" (bar) and "Lime" (scooters), or swap in generic names. They're constants at the top of the script (`BUS_LABEL`, `FOUNTAIN_NAME`).
+- [x] Linked the Daily Nebraskan crime-log story from the "Why" screen. Could still check the archives for earlier fountain-soap incidents.
+- [ ] Follow up with UNLPD on whether anyone was identified or cited for the Sept. 5 incident.
+- [x] Swapped the Group Therapy pedal bus for a Lincoln city bus, and the scooters now match the white/green rental scooters on campus (no logo). Text labels are constants at the top of the script (`BUS_LABEL`, `FOUNTAIN_NAME`).
+- [ ] If we want the real Herbie Husker in the game, ask UNL (Licensing / Athletics marketing) for permission first.
 
 ## 7. Future ideas
 
