@@ -123,5 +123,6 @@ These would make the message stronger, and we need sources before putting them i
 
 - One file: `SudsRun/index.html`. Plain canvas + JavaScript, no libraries, no build step. GitHub Pages serves it as is.
 - Canvas is 960×540 and scales to fit the window (16:9).
+- Phones: menu screens (title, Why, Caught, Pause) cover the whole screen with fixed, readable text sizes, and tighter spacing on short sideways screens. Gameplay is landscape-only: holding a phone upright during play shows a "Turn your phone sideways" screen and pauses a run in progress.
 - Saved data uses localStorage keys starting with `sudsrun.`.
 - Editable text (facts, colors, labels) is near the top of the script.

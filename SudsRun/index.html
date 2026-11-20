@@ -10,7 +10,7 @@
   * { box-sizing:border-box; }
   html,body { margin:0; height:100%; background:var(--ink); color:var(--cream); font-family:"Trebuchet MS", Verdana, sans-serif; }
   body { display:flex; align-items:center; justify-content:center; overflow:hidden; }
-  #wrap { position:relative; width:min(100vw, calc(100vh * 16 / 9)); aspect-ratio:16/9; }
+  #wrap { position:relative; width:min(100vw, calc(100vh * 16 / 9)); width:min(100vw, calc(100dvh * 16 / 9)); aspect-ratio:16/9; }
   canvas { width:100%; height:100%; display:block; touch-action:none; user-select:none; -webkit-user-select:none; background:#8fd0e8; }
   button { font:inherit; font-weight:800; letter-spacing:.04em; cursor:pointer; border:3px solid var(--cream); background:var(--red); color:var(--cream);
            padding:.5em 1.1em; border-radius:10px; box-shadow:0 4px 0 var(--red-dark); text-transform:uppercase; font-size:clamp(11px,1.7vw,18px);
@@ -36,8 +36,10 @@
   @keyframes pulseRed  { 0%,100% { box-shadow:0 4px 0 var(--red-dark), 0 0 0 0 rgba(255,80,80,.8); transform:scale(1); }
                          50%     { box-shadow:0 4px 0 var(--red-dark), 0 0 0 12px rgba(255,80,80,0); transform:scale(1.05); } }
   .hidden { display:none !important; }
-  #overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(10,14,22,.8); text-align:center; padding:2%; overflow:auto; }
-  #panel { max-width:92%; max-height:100%; }
+  /* Menu screens cover the whole browser window (not just the 16:9 game box) and scroll like a normal page */
+  #overlay { position:fixed; inset:0; z-index:20; display:flex; background:rgba(10,14,22,.86); text-align:center; overflow-y:auto;
+             -webkit-overflow-scrolling:touch; padding:max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); }
+  #panel { margin:auto; max-width:min(960px, 100%); }
   h1 { margin:0; font-size:clamp(30px,7vw,78px); line-height:1; color:var(--cream); text-shadow:0 4px 0 var(--red), 0 8px 0 var(--red-dark); letter-spacing:.04em; }
   h2 { margin:.1em 0 .2em; font-size:clamp(22px,4.4vw,48px); text-shadow:0 3px 0 var(--red); }
   h3 { margin:.6em 0 .2em; font-size:clamp(12px,1.8vw,19px); color:#ffd23f; text-transform:uppercase; letter-spacing:.08em; }
@@ -66,12 +68,40 @@
   .fact { background:rgba(208,0,0,.22); border-left:4px solid var(--red); padding:.5em .8em; border-radius:6px; font-size:clamp(10px,1.45vw,15px); }
   .new { color:#7dff9a; font-weight:800; }
   .fine { font-size:clamp(9px,1.1vw,12px); opacity:.7; }
-  #rotate { position:fixed; top:6px; left:0; right:0; text-align:center; font-size:13px; opacity:.75; display:none; }
-  @media (orientation:portrait) and (max-width:700px) { #rotate { display:block; } }
+  /* Phones: readable fixed text sizes instead of sizes that shrink with the screen width */
+  @media (pointer:coarse) {
+    h1 { font-size:46px; } h2 { font-size:32px; } h3 { font-size:14px; }
+    p { font-size:15px; } .tag { font-size:17px; } .truestory { font-size:13px; }
+    .keys { font-size:14px; } #panel button:not(.sw) { font-size:16px; padding:.65em 1.2em; }
+    .sw { font-size:12px; min-width:5.6em; } .stat { font-size:13px; } ul.check, .fact { font-size:14px; } .fine { font-size:12px; }
+  }
+  /* Short sideways phones: tighter spacing, controls in two columns, colors in one swipeable row */
+  @media (pointer:coarse) and (max-height:500px) {
+    h1 { font-size:36px; } h2 { font-size:26px; margin:0; } h3 { margin:.35em 0 .15em; }
+    p { margin:.25em auto; } .tag { font-size:15px; margin-top:.3em; } .truestory { margin:0 auto .2em; }
+    .keys { grid-template-columns:auto auto auto auto; gap:.15em .8em; padding:.4em .8em; margin:.35em 0; font-size:13px; }
+    .colors { flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start; padding-bottom:4px; scrollbar-width:none; }
+    .colors::-webkit-scrollbar { display:none; }
+    .sw { flex:0 0 auto; padding:.25em .45em; }
+    .row { margin-top:.45em; }
+    .stats { margin:.2em 0; } .stat { padding:.2em .7em; }
+    .cols2 { gap:1em; flex-wrap:nowrap; } .cols2 > div { flex:1 1 0; }
+  }
+  /* "Turn your phone" screen shown over the game while playing upright */
+  #turn { position:fixed; inset:0; z-index:30; background:var(--ink); display:flex; flex-direction:column; align-items:center; justify-content:center;
+          gap:14px; padding:24px; text-align:center; }
+  #turn .phone { width:56px; height:96px; border:5px solid var(--cream); border-radius:12px; position:relative; animation:tilt 1.8s ease-in-out infinite; }
+  #turn .phone::after { content:""; position:absolute; bottom:6px; left:50%; width:12px; height:4px; margin-left:-6px; border-radius:2px; background:var(--cream); }
+  #turn b { font-size:22px; } #turn span { font-size:15px; opacity:.8; max-width:20em; }
+  @keyframes tilt { 0%,25% { transform:rotate(0); } 55%,100% { transform:rotate(-90deg); } }
 </style>
 </head>
 <body>
-<div id="rotate">Turn your phone sideways for a bigger view</div>
+<div id="turn" class="hidden" role="alertdialog" aria-label="Turn your phone sideways">
+  <div class="phone"></div>
+  <b>Turn your phone sideways</b>
+  <span id="turnMsg">Suds Run plays in landscape. The game will pick up right where you left off.</span>
+</div>
 <div id="wrap">
   <canvas id="c" width="960" height="540" aria-label="Suds Run game"></canvas>
   <div id="topbtns">
@@ -1486,9 +1516,19 @@ panel.addEventListener('click', e => {
 });
 
 /* ================= Loop ================= */
+// Phones held upright during play get a "turn sideways" screen; a run in progress pauses underneath it
+const turnGate = document.getElementById('turn');
+const portraitMQ = window.matchMedia ? matchMedia('(orientation: portrait)') : { matches:false };
+function checkTurn(){
+  const block = isTouch && portraitMQ.matches && (state==='fountain' || state==='alert' || state==='run' || state==='caught');
+  if (block === !turnGate.classList.contains('hidden')) return;
+  turnGate.classList.toggle('hidden', !block);
+  if (block && state==='run' && !paused) setPaused(true);
+}
 let last = performance.now();
 function frame(now){
   const dt = Math.min(.033, (now-last)/1000); last = now;
+  checkTurn();
   ctx.setTransform(dpr,0,0,dpr,0,0);
   if (!(state==='run' && paused)) clock += dt;
 
