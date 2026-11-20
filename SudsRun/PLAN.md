@@ -48,17 +48,17 @@ Title screen ──► Fountain (free play, no timer)
 - Text pops up as foam grows ("The pump is starting to gurgle…").
 
 ### Run phase
-- Three lanes down Greek Row: houses with columns and Greek letters, trees, sidewalks.
+- Three lanes down Greek Row: houses with columns and Greek letters, trees, sidewalks. Houses are the housed IFC fraternities and PHA sororities listed on fsl.unl.edu (Nov. 2026), shown by their Greek letters (Acacia, FarmHouse and Triangle spelled out) across the top of a white two-story portico on the street side, so you can read them as you run past. Each side of the street switches between three house styles every 2–3 houses: Colonial/Georgian Revival (red brick, two-story white columned portico, shutters, dormers, chimney), Tudor (brick ground floor, half-timbered upper floor, steep slate roof, arched-door vestibule) and Craftsman (painted siding, full-width front porch with piers, name on the porch fascia). Styles and colors are in `STYLE_COLS`. The list is `HOUSE_NAMES` at the top of the run code.
 - Controls: ← → (or A/D) switch lanes, ↑ / W / Space jump, ↓ / S slide. On phones: swipe, or tap to jump.
 - Speed goes up the farther you run.
 
 | Obstacle | Move | What happens if you hit it |
 |---|---|---|
 | Rental e-scooter parked across the lane (white frame, green stem, black deck — no brand logo) | **Jump** | Stumble. The officer catches up. A second stumble within 6 s means you're caught. |
-| Lincoln city bus (navy back, green sides, orange cord stripe, "LINCOLN" + route number) | **Switch lanes** | Caught |
-| Giant inflatable tailgate corn-cob mascot standing with its legs apart (one lane, or three side by side) | **Slide** between its legs | Caught |
+| Lincoln city bus (navy back, green sides with darker green triangles, "LINCOLN" + route number) | **Switch lanes** | Caught |
+| Giant inflatable Nebraska farmer standing with his legs apart (one lane, or three side by side) | **Slide** between his legs | Caught |
 
-**The slide obstacle:** we wanted Herbie Husker, but Herbie is the university's trademarked mascot, so the game uses an original stand-in: a giant inflatable corn-cob mascot in a "GO BIG RED" tee and red shorts, the kind of thing you'd see at a tailgate. If we ever get permission from UNL to use Herbie, `drawMascot()` is the one function to swap.
+**The slide obstacle:** an original giant inflatable farmer, the kind you'd see at a tailgate. He's white, with blonde hair, a red ball cap with a white Nebraska-state patch, a plain white shirt, blue denim overalls with a red Nebraska-state patch on the bib pocket, and he waves an ear of corn. We decided not to use Herbie Husker or a lookalike, so the farmer has his own look. He's drawn in `drawMascot()`. Collision doesn't depend on the art: anything taller than 1.05 m hits, so you always have to slide.
 
 - Bubbles float along the lanes as pickups, in the color you picked. The runner also leaves a trail of bubbles behind them, since they're still soapy.
 
@@ -85,6 +85,7 @@ Most of the message comes from how the game is built, not from text on screen.
 3. **"Meanwhile, at the fountain."** After each run, a checklist shows the cleanup work your foam level would cause (shut off, skim, drain, rinse, check pumps, refill). It's built from your actual coverage %, so it feels personal.
 4. **One fact per round.** A short, rotating "Real talk" line. One sentence, not a paragraph, so it doesn't feel like homework.
 5. **A "Why this game?" screen** for anyone who wants the full explanation.
+6. **A "Based on a true story" news card on the title screen**: a short headline and a two-sentence summary of the Daily Nebraskan story (in our own words), with a link, so every player knows it really happened before they start. The full consequences stay on the Caught and Why screens.
 6. **Tone:** jokes about the chase, never about the damage. The game laughs *with* the player while running, and is straight with them about the fountain.
 
 ### What we avoid
@@ -110,7 +111,6 @@ These would make the message stronger, and we need sources before putting them i
 - [x] Linked the Daily Nebraskan crime-log story from the "Why" screen. Could still check the archives for earlier fountain-soap incidents.
 - [ ] Follow up with UNLPD on whether anyone was identified or cited for the Sept. 5 incident.
 - [x] Swapped the Group Therapy pedal bus for a Lincoln city bus, and the scooters now match the white/green rental scooters on campus (no logo). Text labels are constants at the top of the script (`BUS_LABEL`, `FOUNTAIN_NAME`).
-- [ ] If we want the real Herbie Husker in the game, ask UNL (Licensing / Athletics marketing) for permission first.
 
 ## 7. Future ideas
 

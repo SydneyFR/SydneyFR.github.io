@@ -53,6 +53,12 @@
   .fact { background:rgba(208,0,0,.22); border-left:4px solid var(--red); padding:.5em .8em; border-radius:6px; font-size:clamp(10px,1.45vw,15px); }
   .new { color:#7dff9a; font-weight:800; }
   .fine { font-size:clamp(9px,1.1vw,12px); opacity:.7; }
+  .news { max-width:38em; margin:.7em auto .2em; text-align:left; background:#fdf8ec; color:#1b1b1b; border-radius:8px;
+          border-left:5px solid var(--red); padding:.5em .9em .55em; box-shadow:0 3px 0 rgba(0,0,0,.35); }
+  .news .kick { font-size:clamp(8px,1.05vw,11px); font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--red); }
+  .news .hl { font-family:Georgia, "Times New Roman", serif; font-weight:700; font-size:clamp(13px,2vw,21px); line-height:1.15; margin:.15em 0 .2em; }
+  .news p { margin:0; font-size:clamp(10px,1.3vw,14px); line-height:1.35; max-width:none; color:#333; }
+  .news a { color:var(--red); font-weight:800; white-space:nowrap; }
   #rotate { position:fixed; top:6px; left:0; right:0; text-align:center; font-size:13px; opacity:.75; display:none; }
   @media (orientation:portrait) and (max-width:700px) { #rotate { display:block; } }
 </style>
@@ -372,50 +378,97 @@ function updateFountain(dt){
 }
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 
+// Nebraska Union, front elevation: red-brick wings, pale limestone center block with two towers,
+// curved parapet with the name, balcony windows, "There is No Place Like Nebraska" sign over the
+// main doors with two red N banners, brick-filled arches, red patio umbrellas and a banner lamp post.
 function drawUnion(){
-  const TOP = 98;
+  const TOP = 100, LS = '#dcd0b7', LSd = '#c9bb9e', BR = '#a3473a';
+  const sky = ctx.createLinearGradient(0,0,0,30); sky.addColorStop(0,'#9fd0ee'); sky.addColorStop(1,'#cfe7f5');
+  ctx.fillStyle = sky; ctx.fillRect(0,0,W,TOP);
   // brick wings
-  ctx.fillStyle = '#a5483b'; ctx.fillRect(0,0,W,TOP);
+  ctx.fillStyle = BR; ctx.fillRect(0,14,W,TOP-14);
   ctx.strokeStyle = 'rgba(70,20,15,.16)'; ctx.lineWidth = 1; ctx.beginPath();
-  for (let y=4;y<TOP;y+=5){ ctx.moveTo(0,y); ctx.lineTo(W,y); } ctx.stroke();
-  ctx.fillStyle = '#c9bfab'; ctx.fillRect(0,40,W,4); ctx.fillRect(0,0,W,5);
-  // upper windows
-  for (let x=22; x<W; x+=78) { if (x>330 && x<610) continue;
-    ctx.fillStyle = '#f2efe8'; ctx.fillRect(x,9,40,26); ctx.fillStyle = '#5d7c93'; ctx.fillRect(x+3,12,34,20);
-    ctx.fillStyle = '#f2efe8'; ctx.fillRect(x+19,12,2,20); ctx.fillRect(x+3,21,34,2); }
-  // ground-floor arches with GO / BIG / RED banners
-  const words = ['GO','BIG','RED'];
-  let wi = 0;
-  for (let x=14; x<W; x+=78) { if (x>320 && x<610) continue;
-    ctx.fillStyle = '#c9bfab'; ctx.fillRect(x-4,48,62,TOP-48);
-    ctx.fillStyle = '#3a3532'; ctx.beginPath(); ctx.moveTo(x,TOP); ctx.lineTo(x,64); ctx.arc(x+27,64,27,Math.PI,0); ctx.lineTo(x+54,TOP); ctx.fill();
-    ctx.fillStyle = '#d00000'; ctx.fillRect(x+6,58,42,16); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.strokeRect(x+7,59,40,14);
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 11px Verdana'; ctx.textAlign = 'center'; ctx.fillText(words[wi++%3], x+27, 70);
+  for (let y=18;y<TOP;y+=5){ ctx.moveTo(0,y); ctx.lineTo(W,y); } ctx.stroke();
+  ctx.fillStyle = LS; ctx.fillRect(0,12,W,4);            // cornice
+  ctx.fillStyle = LSd; ctx.fillRect(0,52,W,4);           // belt course
+  // tall white multi-pane windows on the second floor
+  const win = (x,y,w,h) => {
+    ctx.fillStyle = '#f4f2ec'; ctx.fillRect(x,y,w,h);
+    ctx.fillStyle = '#6e8ea6'; ctx.fillRect(x+3,y+3,w-6,h-6);
+    ctx.fillStyle = '#f4f2ec';
+    ctx.fillRect(x+w/3-1,y+3,2,h-6); ctx.fillRect(x+2*w/3-1,y+3,2,h-6); ctx.fillRect(x+3,y+h/2-1,w-6,2);
+    ctx.fillStyle = LS; ctx.fillRect(x-3,y+h,w+6,3);
+  };
+  for (let x=20; x<300; x+=70) win(x,20,40,28);
+  for (let x=660; x<W; x+=70) win(x,20,40,28);
+  // ground floor: brick arches with glass behind (right wing), square windows (left wing)
+  for (let x=14; x<300; x+=70) { ctx.fillStyle = LSd; ctx.fillRect(x-4,58,6,TOP-58); ctx.fillStyle = '#41505a'; ctx.fillRect(x+8,64,36,TOP-64); ctx.fillStyle='#7f9db1'; ctx.fillRect(x+11,67,30,14); }
+  for (let x=654; x<W; x+=70) {
+    ctx.fillStyle = '#8e3c31'; ctx.fillRect(x,58,60,TOP-58);
+    ctx.fillStyle = '#41505a'; ctx.beginPath(); ctx.moveTo(x+8,TOP); ctx.lineTo(x+8,74); ctx.arc(x+30,74,22,Math.PI,0); ctx.lineTo(x+52,TOP); ctx.fill();
+    ctx.strokeStyle = '#c9bb9e'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x+30,74,24,Math.PI,0); ctx.stroke();
+    ctx.fillStyle = '#7f9db1'; ctx.fillRect(x+13,76,34,10);
   }
   // limestone center block
-  ctx.fillStyle = '#d6cdb9'; ctx.fillRect(340,0,280,TOP);
-  ctx.fillStyle = '#c4baa5'; for (const x of [340,388,572,606]) ctx.fillRect(x,0,14,TOP);
-  ctx.fillStyle = '#b9ae98'; ctx.fillRect(402,6,170,18);
-  ctx.fillStyle = '#7b2a22'; ctx.font = 'bold 12px Georgia, serif'; ctx.textAlign = 'center'; ctx.fillText('NEBRASKA UNION', 487, 19);
-  for (let i=0;i<3;i++){ const x = 420+i*46; ctx.fillStyle = '#5d7c93'; ctx.fillRect(x,30,36,20); ctx.fillStyle='#e8e2d4'; ctx.fillRect(x+17,30,2,20); }
-  ctx.fillStyle = '#3a3532'; ctx.fillRect(410,60,154,TOP-60);
-  ctx.fillStyle = '#d00000'; ctx.fillRect(420,62,30,26); ctx.fillRect(524,62,30,26);
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 18px Georgia, serif'; ctx.fillText('N',435,82); ctx.fillText('N',539,82);
-  ctx.fillStyle = '#9fb6c6'; ctx.fillRect(458,64,58,TOP-64);
-  ctx.fillStyle = '#d00000'; ctx.fillRect(410,54,154,7);
+  const L = 318, Rx = 642;
+  ctx.fillStyle = LS; ctx.fillRect(L,4,Rx-L,TOP-4);
+  // towers (slightly proud of the center) with a brick panel up top
+  for (const tx of [L, Rx-72]) {
+    ctx.fillStyle = '#e2d7c0'; ctx.fillRect(tx,2,72,TOP-2);
+    ctx.strokeStyle = 'rgba(120,100,70,.25)'; ctx.lineWidth = 1; ctx.beginPath();
+    for (let y=10;y<TOP;y+=9){ ctx.moveTo(tx,y); ctx.lineTo(tx+72,y); } ctx.stroke();
+    ctx.fillStyle = BR; ctx.fillRect(tx+22,6,28,9);
+    win(tx+18,22,36,26);
+    // brick-filled arch at the base
+    ctx.fillStyle = LSd; ctx.beginPath(); ctx.moveTo(tx+10,TOP); ctx.lineTo(tx+10,72); ctx.arc(tx+36,72,26,Math.PI,0); ctx.lineTo(tx+62,TOP); ctx.fill();
+    ctx.fillStyle = BR; ctx.beginPath(); ctx.moveTo(tx+14,TOP); ctx.lineTo(tx+14,72); ctx.arc(tx+36,72,22,Math.PI,0); ctx.lineTo(tx+58,TOP); ctx.fill();
+    ctx.strokeStyle = 'rgba(70,20,15,.2)'; ctx.beginPath(); for (let y=56;y<TOP;y+=5){ ctx.moveTo(tx+14,y); ctx.lineTo(tx+58,y); } ctx.stroke();
+  }
+  // recessed, curved middle with the name
+  const mL = L+72, mR = Rx-72;
+  ctx.fillStyle = '#d3c6aa'; ctx.beginPath(); ctx.moveTo(mL,14); ctx.quadraticCurveTo((mL+mR)/2,8,mR,14); ctx.lineTo(mR,58); ctx.lineTo(mL,58); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#8e2f25'; ctx.font = 'bold 10px Georgia, serif'; ctx.textAlign = 'center';
+  ctx.fillText('N E B R A S K A   U N I O N', (mL+mR)/2, 23);
+  for (let i=0;i<3;i++) win(mL+14+i*38, 28, 30, 20);
+  ctx.strokeStyle = '#8b8f93'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(mL+6,50); ctx.lineTo(mR-6,50);
+  for (let x=mL+8;x<mR-6;x+=6){ ctx.moveTo(x,50); ctx.lineTo(x,55); } ctx.stroke();
+  // sign band + entrance with two red N banners
+  ctx.fillStyle = '#efe9dc'; ctx.fillRect(mL+4,60,mR-mL-8,8);
+  ctx.fillStyle = '#b3241b'; ctx.font = 'bold 6px Georgia, serif'; ctx.fillText('THERE IS NO PLACE LIKE NEBRASKA', (mL+mR)/2, 66.5);
+  ctx.fillStyle = '#2f3a42'; ctx.fillRect(mL+8,69,mR-mL-16,TOP-69);
+  ctx.fillStyle = '#9fb9c9'; for (let x=mL+12; x<mR-12; x+=14) ctx.fillRect(x,86,10,TOP-86);
+  for (const bx of [mL+28, mR-58]) {
+    ctx.fillStyle = '#c8102e'; ctx.fillRect(bx,70,30,15);
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 12px Georgia, serif'; ctx.fillText('N', bx+15, 82);
+  }
   // steps
-  ctx.fillStyle = '#cbc4b6'; ctx.fillRect(0,TOP,W,12);
-  ctx.strokeStyle = '#b3ab9c'; ctx.beginPath(); ctx.moveTo(0,TOP+4); ctx.lineTo(W,TOP+4); ctx.moveTo(0,TOP+8); ctx.lineTo(W,TOP+8); ctx.stroke();
-  // lamp posts
-  for (const x of [300,660]) { ctx.fillStyle = '#4a4a4a'; ctx.fillRect(x-2,72,4,48); ctx.beginPath(); ctx.arc(x,70,5,0,7); ctx.fillStyle='#f4ecd0'; ctx.fill(); }
+  ctx.fillStyle = '#cbc4b6'; ctx.fillRect(0,TOP,W,14);
+  ctx.strokeStyle = '#b3ab9c'; ctx.lineWidth = 1; ctx.beginPath();
+  for (const y of [TOP+4,TOP+8,TOP+12]) { ctx.moveTo(L-20,y); ctx.lineTo(Rx+20,y); } ctx.stroke();
+  // lamp post with red banners (right of the entrance)
+  ctx.fillStyle = '#4a4a4a'; ctx.fillRect(694,40,4,80);
+  ctx.fillStyle = '#f4ecd0'; ctx.beginPath(); ctx.arc(696,38,5,0,7); ctx.fill();
+  ctx.fillStyle = '#c8102e'; ctx.fillRect(679,50,14,22); ctx.fillRect(699,50,14,22);
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 9px Georgia, serif'; ctx.fillText('N',686,65); ctx.fillText('N',706,65);
+}
+// red patio umbrellas in front of the wings (seen from above)
+function drawUmbrellas(){
+  for (const [x,y] of [[96,132],[236,128],[742,130],[880,134]]) {
+    ctx.fillStyle = 'rgba(0,0,0,.15)'; ctx.beginPath(); ctx.arc(x+5,y+6,22,0,7); ctx.fill();
+    ctx.fillStyle = '#d42a1f'; ctx.beginPath(); ctx.arc(x,y,22,0,7); ctx.fill();
+    ctx.strokeStyle = '#a81d15'; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (let a=0;a<8;a++){ ctx.moveTo(x,y); ctx.lineTo(x+Math.cos(a*Math.PI/4)*22, y+Math.sin(a*Math.PI/4)*22); } ctx.stroke();
+    ctx.fillStyle = '#f2f2f2'; ctx.beginPath(); ctx.arc(x,y,3,0,7); ctx.fill();
+  }
 }
 function drawPlaza(){
   ctx.fillStyle = '#e3ded2'; ctx.fillRect(0,0,W,H);
   ctx.strokeStyle = 'rgba(140,130,115,.22)'; ctx.lineWidth = 1; ctx.beginPath();
-  for (let x=0;x<=W;x+=54){ ctx.moveTo(x,110); ctx.lineTo(x,H); }
-  for (let y=110;y<=H;y+=54){ ctx.moveTo(0,y); ctx.lineTo(W,y); }
+  for (let x=0;x<=W;x+=54){ ctx.moveTo(x,114); ctx.lineTo(x,H); }
+  for (let y=114;y<=H;y+=54){ ctx.moveTo(0,y); ctx.lineTo(W,y); }
   ctx.stroke();
   drawUnion();
+  drawUmbrellas();
   // prairie planting along the bottom
   ctx.fillStyle = '#7a9a4e'; ctx.fillRect(0,H-26,W,26);
   ctx.strokeStyle = '#9bb865'; ctx.lineWidth = 2; ctx.beginPath();
@@ -487,8 +540,8 @@ function drawFountain(){
     ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(b.x-rr*.35,b.y-rr*.35,rr*.25,0,7); ctx.fill(); ctx.globalAlpha=1; }
 
   // plaque
-  ctx.fillStyle='#8a8070'; roundRect(FT.cx-82, 116, 164, 22, 5); ctx.fill();
-  ctx.fillStyle='#f4ecd8'; ctx.font='bold 12px Verdana'; ctx.textAlign='center'; ctx.fillText(FOUNTAIN_NAME, FT.cx, 132);
+  ctx.fillStyle='#8a8070'; roundRect(FT.cx-82, 121, 164, 20, 5); ctx.fill();
+  ctx.fillStyle='#f4ecd8'; ctx.font='bold 12px Verdana'; ctx.textAlign='center'; ctx.fillText(FOUNTAIN_NAME, FT.cx, 135);
   drawSign();
 }
 
@@ -575,14 +628,63 @@ function drawFountainHUD(){
 /* ================= RUN ================= */
 const PZ = 4.5, FOC = 448, CAMH = 2.5, HOR = 190, ZN = .6, ZF = 78, LANE = 1.6, ROADW = 2.7;
 const GRAV = 34, JUMPV = 10.4, SLIDE_T = .72;
-const HOUSE_COLS = [['#a8433a','#c45a4f'],['#efe9dc','#ffffff'],['#c9a77a','#dcbd92'],['#7a8fa6','#93a7bd'],['#b05e3c','#c97852']];
-const GREEK = 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ';
+// [street wall, end wall, brick?]: mostly red brick like the Colonial/Georgian Revival houses on R and 16th,
+// plus tan brick, painted white and grey stone
+const HOUSE_COLS = [['#a8433a','#b9584b',true],['#9c3d31','#ad4c40',true],['#b05e3c','#c06d4a',true],['#c9a77a','#d8b88b',true],['#efe9dc','#f7f3ea',false],['#8f8a84','#a19c95',false]];
+// Each side of the street switches house style every 2–3 houses
+const STYLE_COLS = {
+  colonial: HOUSE_COLS,
+  tudor:  [['#9c3d31','#ad4c40',true],['#8f8a84','#a19c95',false],['#a8433a','#b9584b',true]],
+  porch:  [['#e8dfc8','#efe7d3','siding'],['#cfd8c3','#d9e1ce','siding'],['#f1e3b1','#f5eac3','siding'],['#d6dee4','#e0e7ec','siding']],
+};
+const HOUSE_STYLES = Object.keys(STYLE_COLS);
+const styleRun = { '-1':{ style:'colonial', left:0 }, '1':{ style:'colonial', left:0 } };
+function nextStyle(side){
+  const r = styleRun[side];
+  if (r.left <= 0) { let n; do n = pick(HOUSE_STYLES); while (n === r.style); r.style = n; r.left = 2 + (Math.random()*2|0); }
+  r.left--; return r.style;
+}
+// Housed chapters from UNL Fraternity & Sorority Life (fsl.unl.edu, IFC and PHA lists, Nov. 2026).
+// Chapters without Greek letters are spelled out. Each run deals them out in a shuffled order.
+const HOUSE_NAMES = [
+  // IFC fraternities
+  'ACACIA',  // Acacia
+  'ΑΓΡ',     // Alpha Gamma Rho
+  'ΑΓΣ',     // Alpha Gamma Sigma
+  'ΑΤΩ',     // Alpha Tau Omega
+  'ΒΘΠ',     // Beta Theta Pi
+  'ΔΥ',      // Delta Upsilon
+  'FARMHOUSE',
+  'ΦΔΘ',     // Phi Delta Theta
+  'ΦΓΔ',     // Phi Gamma Delta
+  'ΦΚΘ',     // Phi Kappa Theta
+  'ΦΚΨ',     // Phi Kappa Psi
+  'ΣΑΕ',     // Sigma Alpha Epsilon
+  'ΣΧ',      // Sigma Chi
+  'ΣΦΕ',     // Sigma Phi Epsilon
+  'ΘΞ',      // Theta Xi
+  'TRIANGLE',
+  // PHA sororities
+  'ΑΧΩ',     // Alpha Chi Omega
+  'ΑΟΠ',     // Alpha Omicron Pi
+  'ΑΦ',      // Alpha Phi
+  'ΑΞΔ',     // Alpha Xi Delta
+  'ΧΩ',      // Chi Omega
+  'ΔΔΔ',     // Delta Delta Delta
+  'ΔΓ',      // Delta Gamma
+  'ΓΦΒ',     // Gamma Phi Beta
+  'ΚΑΘ',     // Kappa Alpha Theta
+  'ΚΔ',      // Kappa Delta
+  'ΚΚΓ',     // Kappa Kappa Gamma
+  'ΠΒΦ',     // Pi Beta Phi
+];
+let houseDeck = [];
+function nextHouseName(){ if (!houseDeck.length) houseDeck = HOUSE_NAMES.slice().sort(() => Math.random()-.5); return houseDeck.pop(); }
 const R = { dist:0, speed:13, lane:0, x:0, y:0, vy:0, slideT:0, stumbleT:0, bubbles:0, t:0, nextSpawn:0, cop:0, copX:1.1, hintT:0 };
 const objs = [], houses = [], trees = [], parts = [];
 const lastZ = { '-1':0, '1':0 };
 let camX = 0, sirenFlash = 0;
 
-function greekName(){ const n = Math.random()<.7?2:3; let s=''; for (let i=0;i<n;i++) s+=GREEK[Math.random()*GREEK.length|0]; return s; }
 function resetRun(){
   Object.assign(R, { dist:0, speed:13, lane:0, x:0, y:0, vy:0, slideT:0, stumbleT:0, bubbles:0, t:0, nextSpawn:40, cop:1, copX:1.1, hintT:5 });
   objs.length = houses.length = trees.length = parts.length = 0;
@@ -593,8 +695,12 @@ function resetRun(){
 function spawnScenery(){
   for (const side of [-1,1]) {
     while (lastZ[side] < ZF+12) {
-      const z = lastZ[side], len = rand(6,8.5), col = pick(HOUSE_COLS);
-      houses.push({ side, z, len, h:rand(3.6,4.6), col, letters:greekName(), lit:Math.random()<.5 });
+      const style = nextStyle(side), z = lastZ[side], col = pick(STYLE_COLS[style]), letters = nextHouseName();
+      const pw = Math.max(1.4, letters.length*(/[A-Z]/.test(letters) ? .5 : .72)/2 + .35);
+      const len = Math.max(rand(7,9), 2*pw + 3.4);
+      houses.push({ side, z, len, style, h: style === 'modern' ? rand(5.3,5.8) : rand(4.2,4.8), col, letters, pw, lit:Math.random()<.5,
+        shut:pick(['#1f3b2c','#1b1b1b','#2b3a55']), door:pick(['#6e1a1a','#1b1b1b','#22324f','#4a3022']),
+        pier:pick(['#8e3c31','#8f8a84','#6b5a4a']), dormers:Math.random()<.7, chim: style !== 'modern' && Math.random()<.8 });
       trees.push({ side, z:z+len+1.3, x:side*rand(4.3,4.9), s:rand(.85,1.15) });
       lastZ[side] = z + len + 2.6;
     }
@@ -739,31 +845,224 @@ function drawGround(){
   const fg = ctx.createLinearGradient(0,HOR,0,HOR+24); fg.addColorStop(0,'rgba(253,227,184,.9)'); fg.addColorStop(1,'rgba(253,227,184,0)');
   ctx.fillStyle = fg; ctx.fillRect(0,HOR,W,24);
 }
-function drawHouse(h){
-  const s = h.side, xi = s*6.4, xo = s*10.4, xm = s*8.4, z0 = h.z, z1 = h.z+h.len, top = h.h, ridge = h.h+1.7;
-  if (z1 < ZN) return;
-  vquad(xi, 0, top, z0, z1, h.col[0]);
-  for (let wz = z0+1; wz < z1-.9; wz += 1.7) {
-    vquad(xi, 1.0, 1.9, wz, wz+.8, h.lit ? '#ffe7a3' : '#2f4152');
-    vquad(xi, 2.5, 3.3, wz, wz+.8, h.lit ? '#ffe7a3' : '#2f4152');
+// The house's Greek letters across the portico frieze, drawn in perspective one letter at a time
+// so they read left-to-right on both sides of the road as you run past.
+function facadeName(h, xs, ylo, yhi, zA, zB){
+  if (zA < ZN + .4) return;
+  poly([P(xs,yhi,zA),P(xs,yhi,zB),P(xs,ylo,zB),P(xs,ylo,zA)], '#f7f3ea');
+  const inset = .06;
+  poly([P(xs,yhi-inset,zA+inset),P(xs,yhi-inset,zB-inset),P(xs,ylo+inset,zB-inset),P(xs,ylo+inset,zA+inset)], '#1c2a4a');
+  if (FOC/zA < 7) return; // too far away to read
+  const n = h.letters.length, L = /[A-Z]/.test(h.letters) ? .5 : .72, span = n*L, s0 = (zA+zB)/2 - span/2;
+  // left side: near→far reads left-to-right; right side: far→near does
+  const z0 = h.side < 0 ? s0 : s0 + span, dir = h.side < 0 ? 1 : -1;
+  ctx.save();
+  ctx.font = 'bold 82px Georgia, serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#f7f3ea';
+  for (let i=0;i<n;i++){
+    const za = z0 + dir*i*L, zb = za + dir*L;
+    const a = P(xs, yhi-.05, za), b = P(xs, yhi-.05, zb), c = P(xs, ylo+.05, za);
+    ctx.setTransform(dpr*(b.x-a.x)/100, dpr*(b.y-a.y)/100, dpr*(c.x-a.x)/100, dpr*(c.y-a.y)/100, dpr*a.x, dpr*a.y);
+    ctx.fillText(h.letters[i], 50, 54);
   }
-  const zc = Math.max(z0, ZN);
-  poly([P(xi,top,zc),P(xi,top,z1),P(xm,ridge,z1),P(xm,ridge,zc)], '#5b3a2c');
+  ctx.restore();
+}
+function screenRect(a, b, fill){ ctx.fillStyle = fill; ctx.fillRect(Math.min(a.x,b.x), Math.min(a.y,b.y), Math.abs(b.x-a.x), Math.abs(b.y-a.y)); }
+const TRIM = '#f7f3ea';
+// Dormer window poking out of the roof slope
+function drawDormer(h, xi, top, dz){
+  if (dz < ZN) return;
+  const s = h.side, xd = xi + s*.6, yb = top + .5;
+  vquad(xd, yb, yb+.85, dz, dz+.9, TRIM);
+  vquad(xd, yb+.15, yb+.7, dz+.2, dz+.7, h.lit ? '#ffe7a3' : '#2f4152');
+  sidePoly(xd, [[yb+.85,dz-.08],[yb+.85,dz+.98],[yb+1.3,dz+.45]], '#3f302a');
+}
+// Two-story white portico: columns, porch, front door with a fanlight, lettered frieze and pediment
+function drawPortico(h, xi, zMid){
+  const s = h.side, pw = h.pw, xc = xi - s*1.15, xf = xi - s*1.35, ct = 3.1, zA = zMid - pw, zB = zMid + pw;
+  if (zB < ZN) return;
+  gquad(Math.min(xi, xf - s*.5), Math.max(xi, xf - s*.5), zA - .25, zB + .25, '#dcd7cb', .02);
+  gquad(Math.min(xi, xf - s*.5), Math.max(xi, xf - s*.5), zMid - .7, zMid + .7, '#cfc9bc', .03);
+  // front door
+  if (zMid + .6 > ZN) {
+    vquad(xi, 0, 2.55, zMid - .62, zMid + .62, TRIM);
+    vquad(xi, 0, 2.2, zMid - .45, zMid + .45, h.door);
+    sidePoly(xi, [[2.24,zMid-.42],[2.24,zMid+.42],[2.45,zMid]], '#ffe7a3');
+    vquad(xi, 0, 2.2, zMid - .02, zMid + .02, 'rgba(0,0,0,.35)');
+  }
+  // columns, far to near
+  const span = 2*pw - .3, cols = [];
+  for (let i=0;i<4;i++) cols.push(zA + .15 + span*i/3);
+  cols.sort((a,b) => b-a);
+  for (const cz of cols) {
+    if (cz < ZN + .05) continue;
+    const b = P(xc, 0, cz), t = P(xc, ct, cz), w = Math.max(1.5, b.s*.24);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(b.x - w/2, t.y, w, b.y - t.y);
+    ctx.fillStyle = 'rgba(0,0,0,.13)'; ctx.fillRect(s < 0 ? b.x - w/2 : b.x + w/2 - w*.32, t.y, w*.32, b.y - t.y);
+    ctx.fillStyle = TRIM; ctx.fillRect(b.x - w*.7, t.y, w*1.4, Math.max(1, w*.28)); ctx.fillRect(b.x - w*.7, b.y - w*.3, w*1.4, w*.3);
+  }
+  // porch ceiling, lettered frieze, pediment
+  gquad(Math.min(xi, xf), Math.max(xi, xf), zA - .05, zB + .05, '#e6e0d2', ct);
+  facadeName(h, xf, ct, ct + .75, zA - .05, zB + .05);
+  sidePoly(xf, [[ct+.75,zA-.2],[ct+.75,zB+.2],[ct+1.55,zMid]], TRIM);
+  sidePoly(xf, [[ct+.86,zA+.15],[ct+.86,zB-.15],[ct+1.42,zMid]], '#e9e3d6');
+}
+// Tudor: small brick vestibule with an arched door and a half-timbered gable, name board above the door
+function drawTudorEntry(h, xi, zMid){
+  const s = h.side, xf = xi - s*.8, zA = zMid - h.pw, zB = zMid + h.pw;
+  if (zB < ZN) return;
+  gquad(Math.min(xi, xf - s*.5), Math.max(xi, xf - s*.5), zMid - 1.2, zMid + 1.2, '#cfc9bc', .03);
+  if (zMid + 1.05 > ZN) {
+    vquad(xf, 0, 2.9, zMid - 1.05, zMid + 1.05, h.col[0]);
+    vquad(xf, 0, 1.9, zMid - .42, zMid + .42, h.door);
+    sidePoly(xf, [[1.9,zMid-.42],[1.9,zMid+.42],[2.2,zMid+.25],[2.28,zMid],[2.2,zMid-.25]], h.door);
+    sidePoly(xf, [[2.9,zMid-1.15],[2.9,zMid+1.15],[3.95,zMid]], '#efe6d2');
+    vquad(xf, 2.9, 3.85, zMid - .04, zMid + .04, '#3b2a20');
+    vquad(xf, 2.86, 2.94, zMid - 1.15, zMid + 1.15, '#3b2a20');
+  }
+  facadeName(h, xf - s*.03, 2.12, 2.82, zA, zB);
+}
+// Modern: glass entry under a flat canopy, name band on the wall above it
+function drawModernEntry(h, xi, zMid){
+  const s = h.side, xc = xi - s*1.1, zA = zMid - h.pw, zB = zMid + h.pw;
+  if (zB < ZN) return;
+  gquad(Math.min(xi, xc), Math.max(xi, xc), zMid - 1.3, zMid + 1.3, '#cfc9bc', .03);
+  if (zMid + .95 > ZN) {
+    vquad(xi, 0, 2.5, zMid - .95, zMid + .95, '#3d4248');
+    vquad(xi, .05, 2.42, zMid - .88, zMid + .88, h.lit ? '#ffe7a3' : '#8fb3c7');
+    for (const m of [-.3, .3]) vquad(xi, .05, 2.42, zMid + m - .025, zMid + m + .025, '#3d4248');
+  }
+  gquad(Math.min(xi, xc), Math.max(xi, xc), zMid - 1.3, zMid + 1.3, '#d9d4c8', 2.6);
+  vquad(xc, 2.45, 2.68, zMid - 1.3, zMid + 1.3, '#e9e5dc');
+  facadeName(h, xi - s*.03, 2.85, 3.5, zA, zB);
+}
+// Craftsman: full-width front porch with piers, a railing and the name on the porch-roof fascia
+function drawPorch(h, xi, zMid){
+  const s = h.side, xp = xi - s*1.8, pz0 = h.z + .5, pz1 = h.z + h.len - .5, pt = 2.6;
+  if (pz1 < ZN) return;
+  gquad(Math.min(xi, xp), Math.max(xi, xp), pz0, pz1, '#b9a58a', .45);
+  vquad(xp, 0, .45, pz0, pz1, '#8f7d66');
+  gquad(Math.min(xp, xp - s*.6), Math.max(xp, xp - s*.6), zMid - .6, zMid + .6, '#cfc9bc', .2);
+  if (zMid + .5 > ZN) {
+    vquad(xi, .45, 2.4, zMid - .55, zMid + .55, TRIM);
+    vquad(xi, .45, 2.3, zMid - .42, zMid + .42, h.door);
+    vquad(xi, 1.6, 2.15, zMid - .3, zMid + .3, '#ffe7a3');
+  }
+  // railing, then piers far to near
+  vquad(xp, .95, 1.03, pz0, zMid - .6, TRIM); vquad(xp, .95, 1.03, zMid + .6, pz1, TRIM);
+  const piers = []; for (let pz = pz0 + .1; pz <= pz1 - .05; pz += (pz1 - pz0 - .2)/4) piers.push(pz);
+  piers.sort((a,b) => b-a);
+  for (const pz of piers) {
+    if (pz < ZN + .05) continue;
+    const b = P(xp, .45, pz), m = P(xp, 1.25, pz), t = P(xp, pt, pz), w = Math.max(1.5, b.s*.3);
+    ctx.fillStyle = h.pier; ctx.fillRect(b.x - w/2, m.y, w, b.y - m.y);
+    ctx.fillStyle = TRIM; ctx.beginPath(); ctx.moveTo(m.x - w*.4, m.y); ctx.lineTo(m.x + w*.4, m.y); ctx.lineTo(t.x + w*.25, t.y); ctx.lineTo(t.x - w*.25, t.y); ctx.closePath(); ctx.fill();
+  }
+  // porch roof + fascia with the name
+  gquad(Math.min(xi, xp - s*.25), Math.max(xi, xp - s*.25), pz0 - .15, pz1 + .15, '#4b3a33', pt);
+  vquad(xp - s*.25, pt - .05, pt + .7, pz0 - .15, pz1 + .15, TRIM);
+  facadeName(h, xp - s*.27, pt, pt + .68, zMid - h.pw, zMid + h.pw);
+}
+function wallWindows(h, xi, z0, z1, zMid, glass){
+  if (h.style === 'modern') {
+    [[.8,2.0],[2.45,3.55],[4.1,5.0]].forEach(([y0,y1], fi) => {
+      if (y1 > h.h - .35) return;
+      const segs = fi < 2 ? [[z0+.5, zMid-h.pw-.35],[zMid+h.pw+.35, z1-.5]] : [[z0+.5, z1-.5]];
+      for (const [a,b] of segs) {
+        if (b - a < .6) continue;
+        vquad(xi, y0-.06, y1+.06, a-.06, b+.06, '#3d4248');
+        vquad(xi, y0, y1, a, b, h.lit ? '#ffe7a3' : '#4f6b80');
+        for (let m = a+1.1; m < b-.2; m += 1.1) vquad(xi, y0, y1, m-.03, m+.03, '#3d4248');
+      }
+    });
+    return;
+  }
+  const frame = h.style === 'tudor' ? '#3b2a20' : TRIM;
+  for (let wz = z0+.75; wz < z1-.9; wz += 1.45) {
+    [[.9,2.0],[2.55,3.55]].forEach(([y0,y1], fi) => {
+      if (y1 > h.h - .35) return;
+      if (h.style === 'porch') { if (fi === 0 && wz + .9 > zMid - .8 && wz - .3 < zMid + .8) return; }
+      else if (wz + .9 > zMid - h.pw - .1 && wz - .3 < zMid + h.pw + .1) return;
+      vquad(xi, y0-.08, y1+.08, wz-.08, wz+.78, frame);
+      vquad(xi, y0, y1, wz, wz+.7, glass);
+      vquad(xi, (y0+y1)/2-.03, (y0+y1)/2+.03, wz, wz+.7, frame);
+      if (h.style === 'tudor') vquad(xi, y0, y1, wz+.32, wz+.38, frame);
+      if (h.style === 'colonial') { vquad(xi, y0, y1, wz-.36, wz-.13, h.shut); vquad(xi, y0, y1, wz+.83, wz+1.06, h.shut); }
+    });
+  }
+}
+function drawHouse(h){
+  const s = h.side, st = h.style, xi = s*6.4, xo = s*10.4, xm = s*8.4, z0 = h.z, z1 = h.z+h.len, top = h.h;
+  if (z1 < ZN) return;
+  const ridge = st === 'modern' ? top : top + (st === 'tudor' ? 2.5 : 1.7);
+  const zc = Math.max(z0, ZN), zMid = z0 + h.len/2, glass = h.lit ? '#ffe7a3' : '#2f4152';
+  const roofCol = st === 'tudor' ? '#3a3b42' : '#4b3a33';
+  // street-facing wall
+  vquad(xi, 0, top, z0, z1, h.col[0]);
+  if (st === 'tudor') {
+    vquad(xi, 2.3, top, z0, z1, '#efe6d2');
+    for (let zz = z0+.3; zz < z1-.1; zz += .75) vquad(xi, 2.3, top, zz, zz+.1, '#3b2a20');
+    vquad(xi, 2.24, 2.36, z0, z1, '#3b2a20');
+  }
+  if (h.col[2]) {
+    const yMax = st === 'tudor' ? 2.2 : top - .25;
+    ctx.strokeStyle = h.col[2] === 'siding' ? 'rgba(0,0,0,.08)' : 'rgba(60,20,15,.16)'; ctx.lineWidth = 1; ctx.beginPath();
+    for (let y = .45; y < yMax; y += (h.col[2] === 'siding' ? .22 : .3)) { const a = P(xi,y,zc), b = P(xi,y,z1); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); }
+    ctx.stroke();
+  }
+  vquad(xi, 0, .35, z0, z1, 'rgba(0,0,0,.2)');
+  if (st === 'modern') vquad(xi, top-.4, top, z0, z1, '#d9d4c8');
+  else vquad(xi, top-.2, top, z0, z1, st === 'tudor' ? '#3b2a20' : TRIM);
+  wallWindows(h, xi, z0, z1, zMid, glass);
+  // roof, dormers, chimney
+  if (st !== 'modern') {
+    poly([P(xi,top,zc),P(xi,top,z1),P(xm,ridge,z1),P(xm,ridge,zc)], roofCol);
+    if (st === 'colonial' && h.dormers) for (const dz of [z0 + 1.1, z1 - 2.0]) drawDormer(h, xi, top, dz);
+    if (st === 'porch') drawDormer(h, xi, top, zMid - .45);
+    if (h.chim && z1 - 1 > ZN) {
+      vquad(xm - s*.25, ridge - .5, ridge + .9, z1 - 1, z1 - .4, '#8e3c31');
+      vquad(xm - s*.25, ridge + .75, ridge + .92, z1 - 1.06, z1 - .34, '#4e403b');
+    }
+  } else if (zc < z1) {
+    // rooftop mechanical box
+    vquad(xi + s*1.5, top, top + .7, Math.max(zMid - 1, ZN), zMid + 1, '#aaa59d');
+  }
+  // end wall facing you
   if (z0 >= ZN) {
     poly([P(xi,0,z0),P(xo,0,z0),P(xo,top,z0),P(xi,top,z0)], h.col[1]);
-    poly([P(xi-s*.15,top,z0),P(xo+s*.15,top,z0),P(xm,ridge,z0)], '#f7f3ea');
-    const b = P(xi,0,z0), sc = b.s;
-    // columns + door
-    for (let c=0;c<4;c++){ const cx = xi + s*(.5 + c*1.0); const p1 = P(cx-.12, top, z0), p2 = P(cx+.12, 0, z0);
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(Math.min(p1.x,p2.x), p1.y, Math.abs(p2.x-p1.x), p2.y-p1.y); }
-    const d1 = P(xm-.4, 2.1, z0), d2 = P(xm+.4, 0, z0);
-    ctx.fillStyle = '#3b2418'; ctx.fillRect(Math.min(d1.x,d2.x), d1.y, Math.abs(d2.x-d1.x), d2.y-d1.y);
-    if (sc > 6) {
-      const lp = P(xm, top+.55, z0);
-      ctx.fillStyle = '#1c2a4a'; ctx.font = `bold ${Math.round(sc*.75)}px Georgia, serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(h.letters, lp.x, lp.y); ctx.textBaseline = 'alphabetic';
+    if (st === 'tudor') poly([P(xi,2.3,z0),P(xo,2.3,z0),P(xo,top,z0),P(xi,top,z0)], '#efe6d2');
+    if (st !== 'modern') {
+      poly([P(xi-s*.15,top,z0),P(xo+s*.15,top,z0),P(xm,ridge,z0)], st === 'tudor' ? '#efe6d2' : h.col[1]);
+      const g1 = P(xi-s*.15,top,z0), g2 = P(xm,ridge,z0), g3 = P(xo+s*.15,top,z0);
+      ctx.strokeStyle = st === 'tudor' ? '#3b2a20' : TRIM; ctx.lineWidth = Math.max(1, g1.s*.1); ctx.beginPath();
+      ctx.moveTo(g1.x,g1.y); ctx.lineTo(g2.x,g2.y); ctx.lineTo(g3.x,g3.y); ctx.closePath(); ctx.stroke();
+      if (st === 'tudor') { const a = P(xm,top,z0); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(g2.x,g2.y); ctx.stroke(); }
+    } else {
+      screenRect(P(xi,top,z0), P(xo,top-.4,z0), '#d9d4c8');
+    }
+    if (st === 'modern') {
+      for (const [y0,y1] of [[.8,2.0],[2.45,3.55],[4.1,5.0]]) {
+        if (y1 > top - .35) continue;
+        screenRect(P(xi+s*.4, y1+.06, z0), P(xi+s*3.6, y0-.06, z0), '#3d4248');
+        screenRect(P(xi+s*.46, y1, z0), P(xi+s*3.54, y0, z0), h.lit ? '#ffe7a3' : '#4f6b80');
+      }
+    } else {
+      const frame = st === 'tudor' ? '#3b2a20' : TRIM;
+      for (const wx of [1.0, 2.6]) for (const [y0,y1] of [[.9,2.0],[2.55,3.55]]) {
+        if (y1 > top - .35) continue;
+        screenRect(P(xi+s*(wx-.08), y1+.08, z0), P(xi+s*(wx+.83), y0-.08, z0), frame);
+        screenRect(P(xi+s*wx, y1, z0), P(xi+s*(wx+.75), y0, z0), glass);
+      }
+      if (st === 'colonial') {
+        const r = P(xm, top+.65, z0);
+        ctx.fillStyle = TRIM; ctx.beginPath(); ctx.arc(r.x, r.y, r.s*.32, 0, 7); ctx.fill();
+        ctx.fillStyle = glass; ctx.beginPath(); ctx.arc(r.x, r.y, r.s*.23, 0, 7); ctx.fill();
+      }
     }
   }
+  if (st === 'colonial') drawPortico(h, xi, zMid);
+  else if (st === 'tudor') drawTudorEntry(h, xi, zMid);
+  else if (st === 'modern') drawModernEntry(h, xi, zMid);
+  else drawPorch(h, xi, zMid);
 }
 function drawTree(t){
   if (t.z < ZN) return; const p = P(t.x, 0, t.z), u = p.s/100*t.s;
@@ -809,66 +1108,93 @@ function drawScooter(o){
     ctx.strokeStyle = '#151515'; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(10,-118); ctx.lineTo(24,-116); ctx.moveTo(36,-116); ctx.lineTo(46,-115); ctx.stroke();
   });
 }
-// Giant inflatable tailgate corn-cob mascot: slide between its legs
+// Giant inflatable Nebraska farmer (original character): red ball cap with a white state patch, plain white shirt,
+// denim overalls with a red Nebraska-state patch, waving an ear of corn. Slide between his legs.
+function nebraskaPatch(cx,cy,s,fill='#c8102e',edge='#fff'){
+  // simple Nebraska outline: panhandle on the left, ragged Missouri River edge on the right
+  ctx.save(); ctx.translate(cx,cy); ctx.scale(s,s);
+  ctx.fillStyle = fill; ctx.strokeStyle = edge; ctx.lineWidth = 2.5/s;
+  ctx.beginPath();
+  ctx.moveTo(-24,-10); ctx.lineTo(10,-10); ctx.lineTo(16,-8); ctx.lineTo(20,-4); ctx.lineTo(22,2);
+  ctx.lineTo(24,7); ctx.lineTo(26,10); ctx.lineTo(-12,10); ctx.lineTo(-12,0); ctx.lineTo(-24,0); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
 function drawMascot(o){
   const x = o.lane*LANE;
   shadow(x-.85, o.z, 30); shadow(x+.85, o.z, 30);
   withCm(x, 0, Math.max(o.z, ZN+.01), () => {
     const sway = Math.sin(R.t*2.2 + o.seed)*4, wave = Math.sin(R.t*5 + o.seed);
+    const skin = '#f2c9a4', denim = '#3f6fb5', denimDk = '#2d528a';
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     // tether ropes
     ctx.strokeStyle = 'rgba(60,60,60,.6)'; ctx.lineWidth = 1.5; ctx.beginPath();
-    ctx.moveTo(-95,-260); ctx.lineTo(-150,0); ctx.moveTo(95,-260); ctx.lineTo(150,0); ctx.stroke();
-    // corn-stalk legs, wide apart
+    ctx.moveTo(-95,-270); ctx.lineTo(-150,0); ctx.moveTo(95,-270); ctx.lineTo(150,0); ctx.stroke();
+    // overall legs, wide apart, with work boots
     for (const s of [-1,1]) {
-      ctx.fillStyle = '#4f9a34'; ctx.beginPath();
-      ctx.moveTo(s*104,-6); ctx.lineTo(s*70,-6); ctx.lineTo(s*44,-112); ctx.lineTo(s*84,-112); ctx.closePath(); ctx.fill();
-      ctx.strokeStyle = '#3c7d26'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(s*87,-10); ctx.lineTo(s*64,-108); ctx.stroke();
-      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(s*92,-9,30,13,0,0,7); ctx.fill();
-      ctx.fillStyle = '#d00000'; ctx.fillRect(s*92-18,-12,36,4);
+      ctx.fillStyle = denim; ctx.beginPath();
+      ctx.moveTo(s*106,-14); ctx.lineTo(s*68,-14); ctx.lineTo(s*40,-118); ctx.lineTo(s*90,-118); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = denimDk; ctx.lineWidth = 2; ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(s*87,-18); ctx.lineTo(s*65,-114); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = '#6b4226'; roundRect(s*88-30,-24,60,24,8); ctx.fill();
+      ctx.fillStyle = '#4a2c18'; ctx.fillRect(s*88-30,-6,60,6);
     }
     ctx.translate(sway*.3, 0);
-    // red shorts with an arch between the legs
-    ctx.fillStyle = '#d00000'; ctx.beginPath();
-    ctx.moveTo(-96,-170); ctx.lineTo(96,-170); ctx.lineTo(92,-104); ctx.lineTo(36,-104);
-    ctx.quadraticCurveTo(0,-128,-36,-104); ctx.lineTo(-92,-104); ctx.closePath(); ctx.fill();
-    // white tee
-    ctx.fillStyle = '#fbfbf8'; roundRect(-100,-300,200,140,34); ctx.fill();
-    ctx.fillStyle = '#d00000'; ctx.font = 'bold 34px Verdana'; ctx.textAlign = 'center';
-    ctx.fillText('GO BIG', 0, -240); ctx.fillText('RED', 0, -200);
-    // waving arms
+    // overalls body with an arch between the legs
+    ctx.fillStyle = denim; ctx.beginPath();
+    ctx.moveTo(-98,-190); ctx.lineTo(98,-190); ctx.lineTo(94,-110); ctx.lineTo(38,-110);
+    ctx.quadraticCurveTo(0,-134,-38,-110); ctx.lineTo(-94,-110); ctx.closePath(); ctx.fill();
+    // plain white shirt with a collar
+    ctx.fillStyle = '#f7f7f3'; roundRect(-100,-310,200,130,18); ctx.fill();
+    ctx.fillStyle = '#e4e4de'; ctx.beginPath(); ctx.moveTo(-22,-312); ctx.lineTo(0,-292); ctx.lineTo(22,-312); ctx.lineTo(10,-316); ctx.lineTo(0,-304); ctx.lineTo(-10,-316); ctx.closePath(); ctx.fill();
+    // bib + straps
+    ctx.fillStyle = denim; roundRect(-62,-282,124,100,10); ctx.fill();
+    ctx.fillStyle = denim; ctx.fillRect(-80,-312,20,40); ctx.fillRect(60,-312,20,40);
+    ctx.fillStyle = '#e0b440'; ctx.beginPath(); ctx.arc(-50,-272,7,0,7); ctx.arc(50,-272,7,0,7); ctx.fill();
+    // bib pocket with the Nebraska patch
+    ctx.strokeStyle = denimDk; ctx.lineWidth = 3; ctx.setLineDash([5,4]); ctx.strokeRect(-36,-258,72,52); ctx.setLineDash([]);
+    nebraskaPatch(0,-232,1.25);
+    // arms: rolled white sleeves, one waving an ear of corn
     for (const s of [-1,1]) {
       const up = s<0 ? wave : -wave;
-      const ex = s*(170 + up*8), ey = -350 - up*30;
-      ctx.strokeStyle = '#fbfbf8'; ctx.lineWidth = 34; ctx.beginPath(); ctx.moveTo(s*84,-280); ctx.lineTo(s*125,-318 - up*12); ctx.stroke();
-      ctx.strokeStyle = '#4f9a34'; ctx.lineWidth = 26; ctx.beginPath(); ctx.moveTo(s*125,-318 - up*12); ctx.lineTo(ex,ey); ctx.stroke();
-      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(ex + s*6, ey - 10, 20, 0, 7); ctx.fill();
+      const ex = s*(172 + up*8), ey = -360 - up*30, mx = s*128, my = -330 - up*12;
+      ctx.strokeStyle = '#f7f7f3'; ctx.lineWidth = 36; ctx.beginPath(); ctx.moveTo(s*84,-292); ctx.lineTo(mx,my); ctx.stroke();
+      ctx.strokeStyle = skin; ctx.lineWidth = 26; ctx.beginPath(); ctx.moveTo(mx,my); ctx.lineTo(ex,ey); ctx.stroke();
+      ctx.fillStyle = skin; ctx.beginPath(); ctx.arc(ex+s*4, ey-8, 18, 0, 7); ctx.fill();
+      if (s>0) { // ear of corn in his right hand
+        ctx.save(); ctx.translate(ex+8, ey-26); ctx.rotate(.35);
+        ctx.fillStyle = '#6fae3e'; ctx.beginPath(); ctx.moveTo(-14,20); ctx.quadraticCurveTo(-22,-20,0,-52); ctx.quadraticCurveTo(22,-20,14,20); ctx.fill();
+        ctx.fillStyle = '#f6c945'; ctx.beginPath(); ctx.ellipse(0,-14,10,30,0,0,7); ctx.fill();
+        ctx.fillStyle = '#e3a92c'; for (let k=-38;k<12;k+=8){ ctx.fillRect(-6,k,4,5); ctx.fillRect(2,k+4,4,5); }
+        ctx.restore();
+      }
     }
-    // husk leaves behind the head
-    ctx.fillStyle = '#5fae3e';
-    for (const s of [-1,1]) {
-      ctx.beginPath(); ctx.moveTo(s*20,-300); ctx.quadraticCurveTo(s*110,-380,s*60,-500); ctx.quadraticCurveTo(s*70,-390,s*8,-320); ctx.fill();
-    }
-    // corn-cob head with kernels
+    // head
     ctx.save(); ctx.translate(sway,0);
-    ctx.fillStyle = '#f6c945'; ctx.beginPath(); ctx.ellipse(0,-400,66,104,0,0,7); ctx.fill();
-    ctx.save(); ctx.beginPath(); ctx.ellipse(0,-400,66,104,0,0,7); ctx.clip();
-    ctx.fillStyle = '#e3a92c';
-    for (let ky=-500; ky<-296; ky+=15) for (let kx=-66+((ky/15|0)%2)*7; kx<66; kx+=14) { roundRect(kx+2, ky+2, 10, 11, 4); ctx.fill(); }
-    ctx.restore();
-    // face
-    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(-24,-420,15,18,0,0,7); ctx.ellipse(24,-420,15,18,0,0,7); ctx.fill();
-    ctx.fillStyle = '#1b2a4a'; ctx.beginPath(); ctx.arc(-22,-416,8,0,7); ctx.arc(26,-416,8,0,7); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-19,-420,3,0,7); ctx.arc(29,-420,3,0,7); ctx.fill();
-    ctx.fillStyle = '#7a1010'; ctx.beginPath(); ctx.moveTo(-34,-372); ctx.quadraticCurveTo(0,-330,34,-372); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.fillRect(-26,-372,52,8);
-    // tuft of silk on top
-    ctx.strokeStyle = '#c98a2e'; ctx.lineWidth = 4;
-    for (let i=-2;i<=2;i++){ ctx.beginPath(); ctx.moveTo(i*6,-500); ctx.quadraticCurveTo(i*14,-528,i*20+sway,-534); ctx.stroke(); }
+    ctx.fillStyle = skin; ctx.fillRect(-20,-340,40,30);
+    ctx.beginPath(); ctx.ellipse(0,-392,58,66,0,0,7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-58,-392,10,16,0,0,7); ctx.ellipse(58,-392,10,16,0,0,7); ctx.fill();
+    // blonde hair peeking out under the hat
+    ctx.fillStyle = '#f1d36b';
+    ctx.beginPath(); ctx.ellipse(-46,-430,20,14,-.5,0,7); ctx.ellipse(46,-430,20,14,.5,0,7); ctx.ellipse(0,-440,38,12,0,0,7); ctx.fill();
+    // face: eyes, eyebrows, nose, smile
+    ctx.fillStyle = '#2a2a2a'; ctx.beginPath(); ctx.arc(-20,-404,6,0,7); ctx.arc(20,-404,6,0,7); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-18,-406,2,0,7); ctx.arc(22,-406,2,0,7); ctx.fill();
+    ctx.strokeStyle = '#b9893a'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-30,-420); ctx.lineTo(-10,-424); ctx.moveTo(10,-424); ctx.lineTo(30,-420); ctx.stroke();
+    ctx.fillStyle = '#e8a988'; ctx.beginPath(); ctx.ellipse(0,-386,9,11,0,0,7); ctx.fill();
+    ctx.fillStyle = '#7a1010'; ctx.beginPath(); ctx.moveTo(-22,-358); ctx.quadraticCurveTo(0,-336,22,-358); ctx.closePath(); ctx.fill();
+    // red ball cap with a white Nebraska-state patch
+    ctx.fillStyle = '#c8102e'; ctx.beginPath(); ctx.moveTo(-62,-440); ctx.quadraticCurveTo(-66,-518,0,-520); ctx.quadraticCurveTo(66,-518,62,-440); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#9e0c24'; ctx.lineWidth = 2.5; ctx.beginPath();
+    ctx.moveTo(0,-519); ctx.lineTo(0,-498); ctx.moveTo(-30,-512); ctx.quadraticCurveTo(-40,-480,-44,-446); ctx.moveTo(30,-512); ctx.quadraticCurveTo(40,-480,44,-446); ctx.stroke();
+    ctx.fillStyle = '#9e0c24'; ctx.beginPath(); ctx.arc(0,-520,5,0,7); ctx.fill();
+    nebraskaPatch(0,-476,1.45,'#ffffff','#9e0c24');
+    ctx.fillStyle = '#a80d26'; ctx.beginPath(); ctx.ellipse(0,-438,74,15,0,0,7); ctx.fill();
+    ctx.fillStyle = '#c8102e'; ctx.beginPath(); ctx.ellipse(0,-441,70,11,0,Math.PI,0); ctx.fill();
     ctx.restore();
   });
 }
-// Lincoln city bus: navy back, green sides with darker green triangles and an orange cord stripe
+// Lincoln city bus: navy back, green sides with darker green triangles
 function sidePoly(xs, pts, fill){ poly(pts.map(([y,z]) => P(xs, y, Math.max(z, ZN))), fill); }
 function drawBus(o){
   const xc = o.lane*LANE, x0 = xc-.75, x1 = xc+.75, z0 = Math.max(o.z, ZN), z1 = o.z+o.len, h = 2.45;
@@ -886,9 +1212,6 @@ function drawBus(o){
     sidePoly(xs, [[1.55,z1-2.4],[h,z1-2.4],[h,z1],[1.55,z1]], '#f4f4f2');
     sidePoly(xs, [[.3,o.z],[h,o.z],[h,o.z+.7],[.3,o.z+1.4]], navy);
     for (let zz=o.z+1.2; zz<z1-1.3; zz+=1.5) sidePoly(xs, [[1.3,zz],[2.0,zz],[2.0,zz+1.25],[1.3,zz+1.25]], '#20262c');
-    ctx.strokeStyle = '#f2a51e'; ctx.lineWidth = Math.max(1.5, FOC/Math.max(z0,1)*.06); ctx.beginPath();
-    for (let zz=Math.max(o.z+.8,ZN); zz<=z1-.8; zz+=.25){ const p = P(xs, 1.12 + Math.sin(zz*1.6)*.32, zz); zz===Math.max(o.z+.8,ZN)?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); }
-    ctx.stroke();
     for (const wz of [o.z+1.4, z1-1.6]) { if (wz < ZN) continue; const c = P(xs, .32, wz); ctx.fillStyle = '#151515'; ctx.beginPath(); ctx.ellipse(c.x, c.y-c.s*.12, c.s*.05+1, c.s*.42, 0, 0, 7); ctx.fill(); }
   }
   poly([P(x0,h,z0),P(x1,h,z0),P(x1,h,z1),P(x0,h,z1)], '#e9edf0');
@@ -1067,12 +1390,18 @@ function showTitle(){
   panel.innerHTML = `
     <h1>SUDS RUN</h1>
     <p class="tag">You put soap in the fountain. Now run.</p>
+    <div class="news">
+      <div class="kick">Based on a true story · Daily Nebraskan, Sept. 15, 2026</div>
+      <div class="hl">Soap in Broyhill Fountain causes thousands of dollars in damage</div>
+      <p>Around 2 a.m. on Sept. 5, someone poured soap into the fountain outside the Nebraska Union. UNLPD treated it as vandalism. The fountain had to be drained and refilled, and its filter replaced.
+      <a href="https://www.dailynebraskan.com/news/intoxication-soapy-fountain-scams-mark-first-weeks-of-unl-crime-log/article_5fbc2ccd-4127-408f-b029-08508fe2a4b9.html" target="_blank" rel="noopener">Read the story →</a></p>
+    </div>
     <div class="keys">
       <b>Fountain</b><span>${isTouch?'Drag to swim, hold POUR to add soap':'Arrows/WASD swim · hold Space to pour'}</span>
       <b>Greek Row</b><span>${isTouch?'Swipe ← → lanes · ↑ jump · ↓ slide':'← → lanes · ↑ jump · ↓ slide'}</span>
       <b>Jump</b><span>scooters in the road</span>
       <b>Dodge</b><span>the city bus</span>
-      <b>Slide</b><span>between the giant tailgate mascot’s legs</span>
+      <b>Slide</b><span>between the giant farmer’s legs</span>
     </div>
     <h3>Bubble color</h3>${colorPicker()}
     <p class="fine">Run farther to unlock more colors. Best: ${Math.floor(best)} m</p>
