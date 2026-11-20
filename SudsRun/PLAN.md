@@ -85,7 +85,6 @@ Most of the message comes from how the game is built, not from text on screen.
 3. **"Meanwhile, at the fountain."** After each run, a checklist shows the cleanup work your foam level would cause (shut off, skim, drain, rinse, check pumps, refill). It's built from your actual coverage %, so it feels personal.
 4. **One fact per round.** A short, rotating "Real talk" line. One sentence, not a paragraph, so it doesn't feel like homework.
 5. **A "Why this game?" screen** for anyone who wants the full explanation.
-6. **A "Based on a true story" news card on the title screen**: a short headline and a two-sentence summary of the Daily Nebraskan story (in our own words), with a link, so every player knows it really happened before they start. The full consequences stay on the Caught and Why screens.
 6. **Tone:** jokes about the chase, never about the damage. The game laughs *with* the player while running, and is straight with them about the fountain.
 
 ### What we avoid

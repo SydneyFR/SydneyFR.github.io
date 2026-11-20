@@ -53,12 +53,6 @@
   .fact { background:rgba(208,0,0,.22); border-left:4px solid var(--red); padding:.5em .8em; border-radius:6px; font-size:clamp(10px,1.45vw,15px); }
   .new { color:#7dff9a; font-weight:800; }
   .fine { font-size:clamp(9px,1.1vw,12px); opacity:.7; }
-  .news { max-width:38em; margin:.7em auto .2em; text-align:left; background:#fdf8ec; color:#1b1b1b; border-radius:8px;
-          border-left:5px solid var(--red); padding:.5em .9em .55em; box-shadow:0 3px 0 rgba(0,0,0,.35); }
-  .news .kick { font-size:clamp(8px,1.05vw,11px); font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--red); }
-  .news .hl { font-family:Georgia, "Times New Roman", serif; font-weight:700; font-size:clamp(13px,2vw,21px); line-height:1.15; margin:.15em 0 .2em; }
-  .news p { margin:0; font-size:clamp(10px,1.3vw,14px); line-height:1.35; max-width:none; color:#333; }
-  .news a { color:var(--red); font-weight:800; white-space:nowrap; }
   #rotate { position:fixed; top:6px; left:0; right:0; text-align:center; font-size:13px; opacity:.75; display:none; }
   @media (orientation:portrait) and (max-width:700px) { #rotate { display:block; } }
 </style>
@@ -1390,12 +1384,6 @@ function showTitle(){
   panel.innerHTML = `
     <h1>SUDS RUN</h1>
     <p class="tag">You put soap in the fountain. Now run.</p>
-    <div class="news">
-      <div class="kick">True story · Daily Nebraskan</div>
-      <div class="hl">Soap in Broyhill Fountain causes thousands in damage</div>
-      <p>On Sept. 5, someone soaped the fountain outside the Union. It had to be drained, refilled and given a new filter.
-      <a href="https://www.dailynebraskan.com/news/intoxication-soapy-fountain-scams-mark-first-weeks-of-unl-crime-log/article_5fbc2ccd-4127-408f-b029-08508fe2a4b9.html" target="_blank" rel="noopener">Read the story →</a></p>
-    </div>
     <div class="keys">
       <b>Fountain</b><span>${isTouch?'Drag to swim, hold POUR to add soap':'Arrows/WASD swim · hold Space to pour'}</span>
       <b>Greek Row</b><span>${isTouch?'Swipe ← → lanes · ↑ jump · ↓ slide':'← → lanes · ↑ jump · ↓ slide'}</span>
