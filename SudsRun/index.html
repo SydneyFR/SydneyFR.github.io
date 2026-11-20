@@ -38,8 +38,12 @@
   .hidden { display:none !important; }
   /* Menu screens cover the whole browser window (not just the 16:9 game box) and scroll like a normal page */
   #overlay { position:fixed; inset:0; z-index:20; display:flex; background:rgba(10,14,22,.86); text-align:center; overflow-y:auto;
-             -webkit-overflow-scrolling:touch; padding:max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); }
+             -webkit-overflow-scrolling:touch; touch-action:pan-y; overscroll-behavior:contain;
+             padding:max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); }
   #panel { margin:auto; max-width:min(960px, 100%); }
+  /* Back button that stays pinned to the top of long screens while you scroll */
+  .stickyback { position:sticky; top:0; z-index:2; display:flex; justify-content:flex-start; margin-bottom:.2em; pointer-events:none; }
+  .stickyback button { pointer-events:auto; box-shadow:0 3px 0 var(--red-dark), 0 4px 12px rgba(0,0,0,.5); }
   h1 { margin:0; font-size:clamp(30px,7vw,78px); line-height:1; color:var(--cream); text-shadow:0 4px 0 var(--red), 0 8px 0 var(--red-dark); letter-spacing:.04em; }
   h2 { margin:.1em 0 .2em; font-size:clamp(22px,4.4vw,48px); text-shadow:0 3px 0 var(--red); }
   h3 { margin:.6em 0 .2em; font-size:clamp(12px,1.8vw,19px); color:#ffd23f; text-transform:uppercase; letter-spacing:.08em; }
@@ -1448,6 +1452,7 @@ let whyBack = 'title';
 function showWhy(back){
   whyBack = back;
   panel.innerHTML = `
+    <div class="stickyback"><button class="small" data-act="back">← Back</button></div>
     <h2>Why this game?</h2>
     <p>Soap in the fountain is a classic college prank. It looks hilarious for about an hour.</p>
     <p>Then the fountain gets shut off, skimmed, drained, rinsed, checked and refilled, by real staff, using real water and real money. Detergent can clog pumps and filters, stain the stone and make the plaza slippery for everyone walking past.</p>
@@ -1513,6 +1518,7 @@ panel.addEventListener('click', e => {
   else if (act==='back') { whyBack==='over' ? renderCaught() : showTitle(); }
   else if (act==='resume') setPaused(false);
   else if (act==='quit') { paused = false; showTitle(); }
+  overlay.scrollTop = 0; // every new menu screen starts at the top
 });
 
 /* ================= Loop ================= */
