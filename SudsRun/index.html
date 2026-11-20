@@ -23,6 +23,18 @@
   #fctl { position:absolute; bottom:3%; left:0; right:0; display:flex; justify-content:center; gap:2%; pointer-events:none; }
   #fctl button { pointer-events:auto; }
   #btnPour { background:#2a8fc9; box-shadow:0 4px 0 #134e70; min-width:22%; }
+  /* Phones and tablets: big thumb buttons in the bottom corners, pulsing until used */
+  @media (pointer:coarse) {
+    #fctl { bottom:4%; justify-content:space-between; padding:0 3%; }
+    #fctl button { font-size:clamp(15px,3.8vw,24px); padding:.75em 1.1em; border-width:4px; border-radius:16px; min-width:36%; }
+    #btnPour { animation:pulseBlue 1.3s ease-in-out infinite; }
+    #btnPour.used { animation:none; }
+    #btnRun.ready { animation:pulseRed 1.3s ease-in-out infinite; }
+  }
+  @keyframes pulseBlue { 0%,100% { box-shadow:0 4px 0 #134e70, 0 0 0 0 rgba(92,200,255,.8); transform:scale(1); }
+                         50%     { box-shadow:0 4px 0 #134e70, 0 0 0 12px rgba(92,200,255,0); transform:scale(1.05); } }
+  @keyframes pulseRed  { 0%,100% { box-shadow:0 4px 0 var(--red-dark), 0 0 0 0 rgba(255,80,80,.8); transform:scale(1); }
+                         50%     { box-shadow:0 4px 0 var(--red-dark), 0 0 0 12px rgba(255,80,80,0); transform:scale(1.05); } }
   .hidden { display:none !important; }
   #overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(10,14,22,.8); text-align:center; padding:2%; overflow:auto; }
   #panel { max-width:92%; max-height:100%; }
@@ -116,6 +128,7 @@ const rand = (a,b) => a + Math.random()*(b-a);
 const pick = a => a[Math.random()*a.length|0];
 const clamp = (v,a,b) => v<a?a:v>b?b:v;
 const isTouch = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+if (isTouch) { btnPour.textContent = '🫧 Hold to pour'; btnRun.textContent = 'Run for it! →'; }
 
 const store = {
   get(k,d){ try { const v = localStorage.getItem('sudsrun.'+k); return v==null ? d : JSON.parse(v); } catch(e){ return d; } },
@@ -339,6 +352,7 @@ function updateFountain(dt){
   const pouring = state==='fountain' && (keys.pour || pourBtn);
   if (pouring) {
     sw.poured += dt;
+    if (sw.poured > .6 && !btnPour.classList.contains('used')) btnPour.classList.add('used');
     const hx = sw.x+Math.cos(sw.ang)*20, hy = sw.y+Math.sin(sw.ang)*20;
     addFoam(hx, hy, 32, 3.6*dt);
     if (Math.random()<dt*12) sfx.blub();
@@ -351,6 +365,7 @@ function updateFountain(dt){
 
   let c=0; for (let i=0;i<NC;i++) if (mask[i]===1 && foam[i]>.35) c++;
   coverage = c/waterCells;
+  if (state === 'fountain' && coverage > .15 && !btnRun.classList.contains('ready')) btnRun.classList.add('ready');
   if (fMsg===1 && coverage>.25){ fMsg=2; toast('The pump is starting to gurgle…'); }
   if (fMsg===2 && coverage>.5){ fMsg=3; toast('Half the fountain is foam. Someone’s filming from the Union steps.'); }
   if (fMsg===3 && coverage>.72){ fMsg=4; toast('Foam is spilling onto the plaza.'); }
@@ -1353,6 +1368,7 @@ function drawToasts(dt){
 function enterFountain(){
   resetFountain(); state = 'fountain'; paused = false;
   overlay.classList.add('hidden'); fctl.classList.remove('hidden'); btnPause.classList.add('hidden');
+  btnPour.classList.remove('used'); btnRun.classList.remove('ready');
   toasts.length = 0;
 }
 function startAlert(){
