@@ -43,6 +43,7 @@
   h3 { margin:.6em 0 .2em; font-size:clamp(12px,1.8vw,19px); color:#ffd23f; text-transform:uppercase; letter-spacing:.08em; }
   p { margin:.45em auto; font-size:clamp(11px,1.65vw,17px); max-width:60em; line-height:1.4; }
   .tag { font-size:clamp(12px,2vw,21px); font-weight:700; }
+  .truestory { margin:-.1em auto .4em; font-size:clamp(10px,1.45vw,15px); font-style:italic; color:#ffd9d9; }
   .keys { display:inline-grid; grid-template-columns:auto auto; gap:.25em 1em; text-align:left; font-size:clamp(10px,1.45vw,15px); background:rgba(255,255,255,.07);
           border:2px solid rgba(253,242,208,.35); border-radius:10px; padding:.6em 1em; margin:.6em 0; }
   .keys b { color:#ffd23f; }
@@ -1400,6 +1401,7 @@ function showTitle(){
   panel.innerHTML = `
     <h1>SUDS RUN</h1>
     <p class="tag">You put soap in the fountain. Now run.</p>
+    <p class="truestory">Based on a real Sept. 5 prank at Broyhill Fountain that caused thousands of dollars in damage.</p>
     <div class="keys">
       <b>Fountain</b><span>${isTouch?'Drag to swim, hold POUR to add soap':'Arrows/WASD swim · hold Space to pour'}</span>
       <b>Greek Row</b><span>${isTouch?'Swipe ← → lanes · ↑ jump · ↓ slide':'← → lanes · ↑ jump · ↓ slide'}</span>
